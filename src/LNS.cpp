@@ -38,6 +38,7 @@ LNS::LNS(const Instance &instance, double time_limit, const string &init_algo_na
 
 bool LNS::run() {
     // only for statistic analysis, and thus is not included in runtime
+    // sum_of_distacnes를 my_heuristic에서 가져옴
     sum_of_distances = 0;
     for (const auto &agent: agents) {
         sum_of_distances += agent.path_planner->my_heuristic[agent.path_planner->start_location];
@@ -45,6 +46,7 @@ bool LNS::run() {
 
     initial_solution_runtime = 0;
     start_time = Time::now();
+    // 초기 solution을 구함
     bool succ = getInitialSolution();
     initial_solution_runtime = ((fsec) (Time::now() - start_time)).count();
     if (!succ && initial_solution_runtime < time_limit) {
@@ -179,6 +181,7 @@ bool LNS::getInitialSolution() {
     neighbor.agents.resize(agents.size());
     for (int i = 0; i < (int) agents.size(); i++)
         neighbor.agents[i] = i;
+    // 초기 솔루션에서는 old_sum_of_costs를 MAX_COST로 설정
     neighbor.old_sum_of_costs = MAX_COST;
     neighbor.sum_of_costs = 0;
     bool succ = false;
@@ -333,6 +336,7 @@ bool LNS::runPP() {
     if (!iteration_stats.empty()) // replan
         T = min(T, replan_time_limit);
     auto time = Time::now();
+    // Constraint Table을 할당 (처음에는 아무것도 없음)
     ConstraintTable constraint_table(instance.num_of_cols, instance.map_size, &path_table);
     while (p != shuffled_agents.end() && ((fsec) (Time::now() - time)).count() < T) {
         int id = *p;

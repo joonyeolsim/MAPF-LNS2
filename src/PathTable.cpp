@@ -1,9 +1,12 @@
 #include "PathTable.h"
 
 void PathTable::insertPath(int agent_id, const Path &path) {
+    // space-time table
     if (path.empty())
         return;
     for (int t = 0; t < (int) path.size(); t++) {
+        // 만약 table[path[t].location]의 크기가 t보다 작거나 같다면 시간을 확장해야함.
+        // table[path[t].location]의 크기가 t보다 작거나 같다면, t+1로 확장하고, t+1번째에 NO_AGENT를 넣음.
         if (table[path[t].location].size() <= t)
             table[path[t].location].resize(t + 1, NO_AGENT);
         // assert(table[path[t].location][t] == NO_AGENT);

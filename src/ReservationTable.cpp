@@ -173,6 +173,7 @@ void ReservationTable::updateSIT(int location) {
         sit[location].emplace_back(0, min(constraint_table.length_max, MAX_TIMESTEP - 1) + 1, false);
     }
     // path table
+    // path table이 비어있지 않으면 기존 path들을 sit에 넣어준다.
     if (constraint_table.path_table_for_CT != nullptr and !constraint_table.path_table_for_CT->table.empty()) {
         if (location < constraint_table.map_size) // vertex conflict
         {

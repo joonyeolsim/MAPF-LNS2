@@ -29,8 +29,10 @@ Path SIPP::findPath(const ConstraintTable &constraint_table) {
     //Path path = findNoCollisionPath(constraint_table);
     //if (!path.empty())
     //    return path;
+    // build reservation table
     ReservationTable reservation_table(constraint_table, goal_location);
     Path path;
+    // 처음 safe interval을 가져올 때 해당 location에 대해서 sit가 비어있으면 updateSIT를 호출해서 table을 만듬
     Interval interval = reservation_table.get_first_safe_interval(start_location);
     if (get<0>(interval) > 0)
         return path;

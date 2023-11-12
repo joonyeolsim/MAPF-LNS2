@@ -72,6 +72,11 @@ int main(int argc, char **argv) {
     srand(vm["seed"].as<int>());
 
     if (vm["solver"].as<string>() == "LNS") {
+        /* 생성자 호출 시 destroy_name에 따라 destroy_strategy를 할당
+         * 만약 destroy_name이 Adaptive라면, destroy_weights를 할당
+         * vector<Agent> agents을 Agent의 생성자를 통해 초기화
+         * Agent 클래스는 id, path_planner, path를 멤버로 가짐
+        */
         LNS lns(instance, time_limit,
                 vm["initAlgo"].as<string>(),
                 vm["replanAlgo"].as<string>(),
