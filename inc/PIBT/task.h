@@ -6,36 +6,43 @@
 
 class Task {
 private:
-  std::vector<Node*> G_OPEN;   // remained nodes
-  std::vector<Node*> G_CLOSE;  // finished nodes
+    std::vector<Node *> G_OPEN;   // remained nodes
+    std::vector<Node *> G_CLOSE;  // finished nodes
 
-  const int id;
-  static int cntId;  // for uuid
+    const int id;
+    static int cntId;  // for uuid
 
-  int startTime;  // timestep
-  int endTime;
+    int startTime;  // timestep
+    int endTime;
 
 public:
-  Task();
-  Task(Node* v);
-  Task(std::vector<Node*> nodes);
-  Task(int t);
-  Task(Node* v, int t);
-  ~Task();
+    Task();
 
-  int getId() { return id; }
+    Task(Node *v);
 
-  std::vector<Node*> getG() { return G_OPEN; }
-  void setG(std::vector<Node*> g) { G_OPEN = g; }
+    Task(std::vector<Node *> nodes);
 
-  void addNode(Node* v) { G_OPEN.push_back(v); }
+    Task(int t);
 
-  Node* getNext(Node* v);
+    Task(Node *v, int t);
 
-  void update(Node* v);
+    ~Task();
 
-  bool completed();
-  void setEndTime(int t);
+    int getId() { return id; }
 
-  std::string logStr();
+    std::vector<Node *> getG() { return G_OPEN; }
+
+    void setG(std::vector<Node *> g) { G_OPEN = g; }
+
+    void addNode(Node *v) { G_OPEN.push_back(v); }
+
+    Node *getNext(Node *v);
+
+    void update(Node *v);
+
+    bool completed();
+
+    void setEndTime(int t);
+
+    std::string logStr();
 };

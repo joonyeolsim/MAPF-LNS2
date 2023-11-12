@@ -1,10 +1,10 @@
 #pragma once
+
 #include "GCBSNode.h"
 #include "SpaceTimeAStar.h"
 
 
-class GCBS
-{
+class GCBS {
 public:
     bool randomRoot = false; // randomize the order of the agents in the root CT node
 
@@ -23,23 +23,27 @@ public:
     uint64_t num_HL_expanded = 0;
     uint64_t num_HL_generated = 0;
 
-    GCBSNode* best_node = nullptr;
-    vector<Path*> paths;
+    GCBSNode *best_node = nullptr;
+    vector<Path *> paths;
 
     /////////////////////////////////////////////////////////////////////////////////////////
     // set params
     void setTargetReasoning(bool t) { target_reasoning = t; }
+
     void setDisjointSplitting(bool d) { disjoint_splitting = d; }
+
     void setBypass(bool b) { bypass = b; } // 2-agent solver for heuristic calculation does not need bypass strategy.
     void setSavingStats(bool s) { save_stats = s; }
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // Runs the algorithm until the problem is solved or time is exhausted
     bool solve(double time_limit);
-    void updatePaths(GCBSNode* curr);
 
-    GCBS(vector<SingleAgentSolver*>& search_engines, int screen,
-         const vector<PathTable>* path_tables);
+    void updatePaths(GCBSNode *curr);
+
+    GCBS(vector<SingleAgentSolver *> &search_engines, int screen,
+         const vector<PathTable> *path_tables);
+
     ~GCBS();
 
     // Save results
@@ -53,10 +57,10 @@ private:
     bool bypass; // using Bypass1
     bool save_stats;
 
-    list<GCBSNode*> allNodes_table;
-    const vector<PathTable>* path_tables;
+    list<GCBSNode *> allNodes_table;
+    const vector<PathTable> *path_tables;
 
-    pairing_heap< GCBSNode*, compare<GCBSNode::compare_node_by_d> > focal_list;
+    pairing_heap<GCBSNode *, compare<GCBSNode::compare_node_by_d> > focal_list;
 
     int screen;
     double time_limit = -1;
@@ -68,24 +72,30 @@ private:
 
     // vector<Path> paths_found_initially;  // contain initial paths found
     // vector<MDD*> mdds_initially;  // contain initial paths found
-    vector < SingleAgentSolver* > search_engines;  // used to find (single) agents' paths and mdd
+    vector<SingleAgentSolver *> search_engines;  // used to find (single) agents' paths and mdd
 
-    void addConstraints(const GCBSNode* curr, GCBSNode* child1, GCBSNode* child2) const;
-    set<int> getInvalidAgents(const list<Constraint>& constraints); // return agents that violates the constraints
+    void addConstraints(const GCBSNode *curr, GCBSNode *child1, GCBSNode *child2) const;
+
+    set<int> getInvalidAgents(const list<Constraint> &constraints); // return agents that violates the constraints
     //conflicts
-    void findConflicts(GCBSNode& curr);
-    void findConflicts(GCBSNode& curr, int a1, int a2);
+    void findConflicts(GCBSNode &curr);
+
+    void findConflicts(GCBSNode &curr, int a1, int a2);
+
     shared_ptr<Conflict> chooseConflict(const GCBSNode &node) const;
-    static void copyConflicts(const list<shared_ptr<Conflict>>& conflicts,
-                              list<shared_ptr<Conflict>>& copy, const list<int>& excluded_agent);
+
+    static void copyConflicts(const list<shared_ptr<Conflict>> &conflicts,
+                              list<shared_ptr<Conflict>> &copy, const list<int> &excluded_agent);
 
     inline void releaseNodes();
 
     // print and save
     void printResults() const;
-    static void printConflicts(const GCBSNode &curr) ;
+
+    static void printConflicts(const GCBSNode &curr);
 
     bool validateSolution() const;
+
     inline int getAgentLocation(int agent_id, size_t timestep) const;
 
     vector<int> shuffleAgents() const;  //generate random permutation of agent indices
@@ -93,16 +103,20 @@ private:
 
 
     // node operators
-    inline void pushNode(GCBSNode* node);
-    GCBSNode* selectNode();
-    inline bool reinsertNode(GCBSNode* node);
+    inline void pushNode(GCBSNode *node);
+
+    GCBSNode *selectNode();
+
+    inline bool reinsertNode(GCBSNode *node);
 
     bool terminate();
 
     // high level search
-    bool generateChild(GCBSNode* child, GCBSNode* curr);
+    bool generateChild(GCBSNode *child, GCBSNode *curr);
+
     bool generateRoot();
-    bool findPathForSingleAgent(GCBSNode* node, int ag);
+
+    bool findPathForSingleAgent(GCBSNode *node, int ag);
 
     void printPaths() const;
 };

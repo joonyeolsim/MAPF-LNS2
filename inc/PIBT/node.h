@@ -7,30 +7,39 @@
 
 class Node {
 private:
-  const int id;
-  const int index;
-  std::vector<Node*> neighbor;
-  Vec2f pos;
+    const int id;
+    const int index;
+    std::vector<Node *> neighbor;
+    Vec2f pos;
 
-  static int cntIndex;
+    static int cntIndex;
 
 public:
-  Node();
-  Node(int _id);
-  ~Node() {};
+    Node();
 
-  std::vector<Node*> getNeighbor() { return neighbor; }
-  void setNeighbor(std::vector<Node*> nodes) { neighbor = nodes; }
+    Node(int _id);
 
-  int getId() { return id; }
-  int getIndex() { return index; }
+    ~Node() {};
 
-  Vec2f getPos() { return pos; }
-  void  setPos(Vec2f _pos) { pos = _pos; }
-  void  setPos(int x, int y) { pos = Vec2f(x, y); }
+    std::vector<Node *> getNeighbor() { return neighbor; }
 
-  bool operator==(Node* v) const { return v->getId() == id; };
-  bool operator!=(Node* v) const { return v->getId() != id; };
-  bool operator==(Node& v) const { return v.getId() == id; };
-  bool operator!=(Node& v) const { return v.getId() != id; };
+    void setNeighbor(std::vector<Node *> nodes) { neighbor = nodes; }
+
+    int getId() { return id; }
+
+    int getIndex() { return index; }
+
+    Vec2f getPos() { return pos; }
+
+    void setPos(Vec2f _pos) { pos = _pos; }
+
+    void setPos(int x, int y) { pos = Vec2f(x, y); }
+
+    bool operator==(Node *v) const { return v->getId() == id; };
+
+    bool operator!=(Node *v) const { return v->getId() != id; };
+
+    bool operator==(Node &v) const { return v.getId() == id; };
+
+    bool operator!=(Node &v) const { return v.getId() != id; };
 };

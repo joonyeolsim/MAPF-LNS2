@@ -1,25 +1,33 @@
 #pragma once
+
 #include "BasicLNS.h"
 
-enum init_destroy_heuristic { TARGET_BASED, COLLISION_BASED, RANDOM_BASED, INIT_COUNT };
+enum init_destroy_heuristic {
+    TARGET_BASED, COLLISION_BASED, RANDOM_BASED, INIT_COUNT
+};
 
-class InitLNS : public BasicLNS
-{
+class InitLNS : public BasicLNS {
 public:
-    vector<Agent>& agents;
+    vector<Agent> &agents;
     int num_of_colliding_pairs = 0;
 
-    InitLNS(const Instance& instance, vector<Agent>& agents, double time_limit,
-            const string & replan_algo_name, const string & init_destory_name, int neighbor_size, int screen);
+    InitLNS(const Instance &instance, vector<Agent> &agents, double time_limit,
+            const string &replan_algo_name, const string &init_destory_name, int neighbor_size, int screen);
 
     bool getInitialSolution();
+
     bool run();
-    void writeIterStatsToFile(const string & file_name) const;
-    void writeResultToFile(const string & file_name, int sum_of_distances, double preprocessing_time) const;
+
+    void writeIterStatsToFile(const string &file_name) const;
+
+    void writeResultToFile(const string &file_name, int sum_of_distances, double preprocessing_time) const;
+
     string getSolverName() const override { return "InitLNS(" + replan_algo_name + ")"; }
 
     void printPath() const;
+
     void printResult();
+
     void clear(); // delete useless data to save memory
 
 private:
@@ -34,15 +42,19 @@ private:
 
 
     bool runPP();
+
     bool runGCBS();
+
     bool runPBS();
 
-    bool updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int agent_id, const Path& path) const;
+    bool updateCollidingPairs(set<pair<int, int>> &colliding_pairs, int agent_id, const Path &path) const;
 
     void chooseDestroyHeuristicbyALNS();
 
     bool generateNeighborByCollisionGraph();
+
     bool generateNeighborByTarget();
+
     bool generateNeighborRandomly();
 
     // int findRandomAgent() const;
@@ -50,8 +62,8 @@ private:
 
     void printCollisionGraph() const;
 
-    static unordered_map<int, set<int>>& findConnectedComponent(const vector<set<int>>& graph, int vertex,
-            unordered_map<int, set<int>>& sub_graph);
+    static unordered_map<int, set<int>> &findConnectedComponent(const vector<set<int>> &graph, int vertex,
+                                                                unordered_map<int, set<int>> &sub_graph);
 
     bool validatePathTable() const;
 };

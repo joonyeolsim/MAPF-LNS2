@@ -30,27 +30,34 @@
 
 
 #pragma once
+
 #include "grid.h"
 
 class SimpleGrid : public Grid {
 protected:
-  std::string filename;
+    std::string filename;
 
-  void init();
-  void setBasicParams();
-  void createNodes();
-  void createEdges();
-  virtual void setStartGoal();
+    void init();
+
+    void setBasicParams();
+
+    void createNodes();
+
+    void createEdges();
+
+    virtual void setStartGoal();
 
 public:
-  SimpleGrid(std::string _filename);
-  SimpleGrid(std::string _filename, std::mt19937* _MT);
-  ~SimpleGrid();
+    SimpleGrid(std::string _filename);
 
-  // for iterative MAPF
-  virtual Node* getNewGoal(Node* v);
+    SimpleGrid(std::string _filename, std::mt19937 *_MT);
 
-  std::string getMapName() { return filename; }
+    ~SimpleGrid();
 
-  std::string logStr();
+    // for iterative MAPF
+    virtual Node *getNewGoal(Node *v);
+
+    std::string getMapName() { return filename; }
+
+    std::string logStr();
 };

@@ -1,11 +1,10 @@
 #include "CBSNode.h"
 
 
-void HLNode::clear()
-{
-	conflicts.clear();
-	unknownConf.clear();
-	// conflictGraph.clear();
+void HLNode::clear() {
+    conflicts.clear();
+    unknownConf.clear();
+    // conflictGraph.clear();
 }
 
 /*void HLNode::printConflictGraph(int num_of_agents) const
@@ -24,32 +23,27 @@ void HLNode::clear()
 	cout << endl;
 }*/
 
-void HLNode::updateDistanceToGo()
-{
-	set<pair<int, int>> conflicting_agents;
-	for (const auto& conflict : unknownConf) // unknownConf store all conflicts
-	{
-		auto agents = make_pair(min(conflict->a1, conflict->a2), max(conflict->a1, conflict->a2));
-		if (conflicting_agents.find(agents) == conflicting_agents.end())
-		{
-			conflicting_agents.insert(agents);
-		}
-	}
-	distance_to_go  = (int)(conflicts.size() + conflicting_agents.size()); // while conflicts only store one conflict per pair of agents
+void HLNode::updateDistanceToGo() {
+    set<pair<int, int>> conflicting_agents;
+    for (const auto &conflict: unknownConf) // unknownConf store all conflicts
+    {
+        auto agents = make_pair(min(conflict->a1, conflict->a2), max(conflict->a1, conflict->a2));
+        if (conflicting_agents.find(agents) == conflicting_agents.end()) {
+            conflicting_agents.insert(agents);
+        }
+    }
+    distance_to_go = (int) (conflicts.size() +
+                            conflicting_agents.size()); // while conflicts only store one conflict per pair of agents
 }
 
-void HLNode::printConstraints(int id) const
-{
+void HLNode::printConstraints(int id) const {
     auto curr = this;
-    while (curr->parent != nullptr)
-    {
+    while (curr->parent != nullptr) {
         int a, x, y, t;
         constraint_type type;
-        for (auto constraint : curr->constraints)
-        {
+        for (auto constraint: curr->constraints) {
             tie(a, x, y, t, type) = curr->constraints.front();
-            switch (type)
-            {
+            switch (type) {
                 case constraint_type::LEQLENGTH:
                 case constraint_type::POSITIVE_VERTEX:
                 case constraint_type::POSITIVE_EDGE:
@@ -57,7 +51,7 @@ void HLNode::printConstraints(int id) const
                     break;
                 case constraint_type::GLENGTH:
                 case constraint_type::VERTEX:
-                case  constraint_type::EDGE:
+                case constraint_type::EDGE:
                 case constraint_type::BARRIER:
                 case constraint_type::RANGE:
                     if (a == id)
@@ -69,11 +63,10 @@ void HLNode::printConstraints(int id) const
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const HLNode& node)
-{
-	os << "Node " << node.time_generated << " from " << node.chosen_from << " ( f = "<< node.g_val << " + " <<
-		node.h_val << ", f hat = " << node.getFHatVal() - node.cost_to_go << " + " << node.cost_to_go <<
-		", d = " << node.distance_to_go << " ) with " <<
-		node.getNumNewPaths() << " new paths ";
-	return os;
+std::ostream &operator<<(std::ostream &os, const HLNode &node) {
+    os << "Node " << node.time_generated << " from " << node.chosen_from << " ( f = " << node.g_val << " + " <<
+       node.h_val << ", f hat = " << node.getFHatVal() - node.cost_to_go << " + " << node.cost_to_go <<
+       ", d = " << node.distance_to_go << " ) with " <<
+       node.getNumNewPaths() << " new paths ";
+    return os;
 }

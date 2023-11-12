@@ -1,4 +1,5 @@
 #pragma once
+
 #include <tuple>
 #include <list>
 #include <vector>
@@ -46,35 +47,37 @@ typedef std::chrono::duration<float> fsec;
 #define MAX_COST INT_MAX / 2
 #define MAX_NODES INT_MAX / 2
 
-struct PathEntry
-{
-	int location = -1;
-	explicit PathEntry(int loc = -1) { location = loc; }
+struct PathEntry {
+    int location = -1;
+
+    explicit PathEntry(int loc = -1) { location = loc; }
 };
 
 typedef vector<PathEntry> Path;
-std::ostream& operator<<(std::ostream& os, const Path& path);
-bool isSamePath(const Path& p1, const Path& p2);
 
-struct IterationStats
-{
+std::ostream &operator<<(std::ostream &os, const Path &path);
+
+bool isSamePath(const Path &p1, const Path &p2);
+
+struct IterationStats {
     int sum_of_costs;
     double runtime;
     int num_of_agents;
     string algorithm;
     int sum_of_costs_lowerbound;
     int num_of_colliding_pairs;
-    IterationStats(int num_of_agents, int sum_of_costs, double runtime, const string& algorithm,
+
+    IterationStats(int num_of_agents, int sum_of_costs, double runtime, const string &algorithm,
                    int sum_of_costs_lowerbound = 0, int num_of_colliding_pairs = 0) :
             num_of_agents(num_of_agents), sum_of_costs(sum_of_costs), runtime(runtime),
             sum_of_costs_lowerbound(sum_of_costs_lowerbound), algorithm(algorithm),
             num_of_colliding_pairs(num_of_colliding_pairs) {}
 };
 
-struct PIBTPPS_option{
-    int windowSize ;
-    bool winPIBTSoft ;
-    int timestepLimit ;
+struct PIBTPPS_option {
+    int windowSize;
+    bool winPIBTSoft;
+    int timestepLimit;
 };
 
 
