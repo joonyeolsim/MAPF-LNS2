@@ -5,11 +5,10 @@
 class LLNode // low-level node
 {
 public:
-    int location = 0;
+    State state;
     int g_val = 0;
     int h_val = 0;
     LLNode* parent = nullptr;
-    int timestep = 0;
     int num_of_conflicts = 0;
     bool in_openlist = false;
     bool wait_at_goal = false; // the action is to wait at the goal vertex or not. This is used for >lenghth constraints
@@ -51,9 +50,8 @@ public:
     LLNode() {
     }
 
-    LLNode(int location, int g_val, int h_val, LLNode* parent, int timestep, int num_of_conflicts) : location(location),
-        g_val(g_val), h_val(h_val), parent(parent), timestep(timestep),
-        num_of_conflicts(num_of_conflicts) {
+    LLNode(State state, int g_val, int h_val, LLNode* parent, int num_of_conflicts) : state(state),
+        g_val(g_val), h_val(h_val), parent(parent), num_of_conflicts(num_of_conflicts) {
     }
 
     LLNode(const LLNode&other) { copy(other); }
@@ -61,11 +59,10 @@ public:
     ~LLNode() = default;
 
     void copy(const LLNode&other) {
-        location = other.location;
+        state = other.state;
         g_val = other.g_val;
         h_val = other.h_val;
         parent = other.parent;
-        timestep = other.timestep;
         num_of_conflicts = other.num_of_conflicts;
         wait_at_goal = other.wait_at_goal;
         is_goal = other.is_goal;

@@ -155,6 +155,6 @@ void SingleAgentSolver::findMinimumSetofColldingTargets(vector<int>&goal_table, 
 }
 
 std::ostream& operator<<(std::ostream&os, const LLNode&node) {
-    os << node.location << "@" << node.timestep << "(f=" << node.g_val << "+" << node.h_val << ")";
+    os << node.state.location << "@" << node.state.timestep << "(f=" << node.g_val << "+" << node.h_val << ")";
     return os;
 }
