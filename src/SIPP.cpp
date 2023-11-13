@@ -33,15 +33,21 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
     ReservationTable reservation_table(constraint_table, goal_location);
     Path path;
     // 처음 safe interval을 가져올 때 해당 location에 대해서 sit가 비어있으면 updateSIT를 호출해서 table을 만듬
+    // 모든 SIT를 한번에 만드는것이 아니라 필요할 때만 만듬.
     Interval interval = reservation_table.get_first_safe_interval(start_location);
     if (get<0>(interval) > 0)
         return path;
+    // Agent가 해당 location을 holding할 수 있는 최소 timestep
+    // goal location에
     auto holding_time = constraint_table.getHoldingTime(goal_location, constraint_table.length_min);
     auto last_target_collision_time = constraint_table.getLastCollisionTimestep(goal_location);
     // generate start and add it to the OPEN & FOCAL list
+    // holding_time은 항상 0이기에 my_heuristic[start_location]을 고르고 last_target_collision_time + 1 중에서 큰걸 고른다.
+    // 즉, goal location에 장애물이 존재한다면 last_target_collision_time + 1이 된다.
     auto h = max(max(my_heuristic[start_location], holding_time), last_target_collision_time + 1);
     auto start = new SIPPNode(start_location, 0, h, nullptr, 0, get<1>(interval), get<1>(interval),
                               get<2>(interval), get<2>(interval));
+    // Bouded Suboptimal이 아니기에 focal list에서만 push한다.
     pushNodeToFocal(start);
 
     while (!focal_list.empty()) {
@@ -55,9 +61,9 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
             updatePath(curr, path);
             break;
         }
-        else if (curr->location == goal_location && // arrive at the goal location
-                 !curr->wait_at_goal && // not wait at the goal location
-                 curr->timestep >= holding_time) // the agent can hold the goal location afterward
+        if (curr->location == goal_location && // arrive at the goal location
+            !curr->wait_at_goal && // not wait at the goal location
+            curr->timestep >= holding_time) // the agent can hold the goal location afterward
         {
             int future_collisions = constraint_table.getFutureNumOfCollisions(curr->location, curr->timestep);
             if (future_collisions == 0) {
@@ -82,15 +88,13 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
                      curr->location, next_location, curr->timestep + 1, curr->high_expansion + 1)) {
                 int next_high_generation, next_timestep, next_high_expansion;
                 bool next_v_collision, next_e_collision;
+                // <upper_bound, low, high, vertex collision, edge collision>
                 tie(next_high_generation, next_timestep, next_high_expansion, next_v_collision, next_e_collision) = i;
                 if (next_timestep + my_heuristic[next_location] > constraint_table.length_max)
                     break;
-                auto next_collisions = curr->num_of_conflicts +
-                                       // (int)curr->collision_v * max(next_timestep - curr->timestep - 1, 0) + // wait time
-                                       (int)next_v_collision + (int)next_e_collision;
+                auto next_collisions = curr->num_of_conflicts + (int)next_v_collision + (int)next_e_collision;
                 auto next_h_val = max(my_heuristic[next_location],
-                                      (next_collisions > 0 ? holding_time : curr->getFVal()) -
-                                      next_timestep); // path max
+                                      (next_collisions > 0 ? holding_time : curr->getFVal()) - next_timestep); // path max
                 // generate (maybe temporary) node
                 auto next = new SIPPNode(next_location, next_timestep, next_h_val, curr, next_timestep,
                                          next_high_generation, next_high_expansion, next_v_collision, next_collisions);
@@ -102,6 +106,10 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
             }
         } // end for loop that generates successors
         // wait at the current location
+        // 현재 속한 safe interval의 high와 현재 node의 high가 같고
+        // 현재 위치에서 safe interval을 받을수 있고
+        // f score가 constraint_table.length_max보다 작다면
+        // 기다리는 동작 추가?
         if (curr->high_expansion == curr->high_generation and
             reservation_table.find_safe_interval(interval, curr->location, curr->high_expansion) and
             get<0>(interval) + curr->h_val <= reservation_table.constraint_table.length_max) {
@@ -428,9 +436,9 @@ bool SIPP::dominanceCheck(SIPPNode* new_node) {
             // the new node is dominated by the old node
             return false;
         }
-        else if (old_node->timestep >= new_node->timestep and
-                 old_node->num_of_conflicts >=
-                 new_node->num_of_conflicts) // the old node is dominated by the new node
+        if (old_node->timestep >= new_node->timestep and
+            old_node->num_of_conflicts >=
+            new_node->num_of_conflicts) // the old node is dominated by the new node
         {
             // delete the old node
             if (old_node->in_openlist) // the old node has not been expanded yet
@@ -443,8 +451,8 @@ bool SIPP::dominanceCheck(SIPPNode* new_node) {
             // this is because we later will increase num_generated when we insert the new node into lists.
             return true;
         }
-        else if (old_node->timestep < new_node->high_expansion and new_node->timestep <
-                 old_node->high_expansion) {
+        if (old_node->timestep < new_node->high_expansion and new_node->timestep <
+            old_node->high_expansion) {
             // intervals overlap --> we need to split the node to make them disjoint
             if (old_node->timestep <= new_node->timestep) {
                 assert(old_node->num_of_conflicts > new_node->num_of_conflicts);

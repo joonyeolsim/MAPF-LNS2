@@ -154,6 +154,9 @@ void ReservationTable::insertSoftConstraint2SIT(int location, int t_min, int t_m
 void ReservationTable::updateSIT(int location) {
     assert(sit[location].empty());
     // length constraints for the goal location
+    // length_min = 0
+    // length_max = MAX_TIMESTEP
+    // 초기화 부분인데 우리 구현상 goal location이 맞든 아니든 [0, MAX_TIMESTEP) interval을 넣어준다.
     if (location ==
         goal_location) // we need to divide the same intervals into 2 parts [0, length_min) and [length_min, length_max + 1)
     {
@@ -167,9 +170,13 @@ void ReservationTable::updateSIT(int location) {
             sit[location].emplace_back(0, constraint_table.length_min, false);
         }
         assert(constraint_table.length_min >= 0);
+
+        // 위 코드에 들어갈 일이 없고 아래 코드만 보면됨.
+        // 즉, goal location의 interval은 [0, MAX_TIMESTEP) 인듯
         sit[location].emplace_back(constraint_table.length_min, min(constraint_table.length_max + 1, MAX_TIMESTEP),
                                    false);
     } else {
+        // Goal location이 아니면 [0, MAX_TIMESTEP) interval을 넣어준다.
         sit[location].emplace_back(0, min(constraint_table.length_max, MAX_TIMESTEP - 1) + 1, false);
     }
     // path table
@@ -178,10 +185,12 @@ void ReservationTable::updateSIT(int location) {
         if (location < constraint_table.map_size) // vertex conflict
         {
             for (int t = 0; t < (int) constraint_table.path_table_for_CT->table[location].size(); t++) {
+                // path table에서 해당 location을 t초에 차지하는 agent가 있다면 sit에 넣어준다.
                 if (constraint_table.path_table_for_CT->table[location][t] != NO_AGENT) {
                     insert2SIT(location, t, t + 1);
                 }
             }
+            // target complete는 [goal_t, inf) interval을 넣어준다.
             if (constraint_table.path_table_for_CT->goals[location] < MAX_TIMESTEP) // target conflict
                 insert2SIT(location, constraint_table.path_table_for_CT->goals[location], MAX_TIMESTEP + 1);
         } else // edge conflict
@@ -202,6 +211,7 @@ void ReservationTable::updateSIT(int location) {
         }
     }
 
+    // negative랑 positive는 안들어감. 무시해도됨.
     // negative constraints
     const auto &it = constraint_table.ct.find(location);
     if (it != constraint_table.ct.end()) {
@@ -219,6 +229,8 @@ void ReservationTable::updateSIT(int location) {
     }
 
     // soft path table
+    // SIPPS는 path table for ct를 사용하지 않고 cat을 사용함.
+    // SIT를 갈라버리는게 아니라 soft constraints를 적용할 수 있도록
     if (constraint_table.path_table_for_CAT != nullptr and
         !constraint_table.path_table_for_CAT->table.empty()) {
         if (location < constraint_table.map_size) // vertex conflict
@@ -294,10 +306,13 @@ ReservationTable::get_safe_intervals(int from, int to, int lower_bound, int uppe
         { // so we need to check the move action has collisions or not
             auto t2 = get_earliest_no_collision_arrival_time(from, to, interval, t1, upper_bound);
             if (t1 == t2)
+                // 아무런 collision이 없기에 그냥 interval을 넣어줌
                 rst.emplace_back(get<1>(interval), t1, get<1>(interval), false, false);
             else if (t2 < 0)
+                // low'이 존재하지 않는 경우 적어도 하나의 edge collision이 존재함.
                 rst.emplace_back(get<1>(interval), t1, get<1>(interval), false, true);
             else {
+                // edge collision 발생 [low, low'), [low', high)로 나눠서 넣어줌.
                 rst.emplace_back(get<1>(interval), t1, t2, false, true);
                 rst.emplace_back(get<1>(interval), t2, get<1>(interval), false, false);
             }

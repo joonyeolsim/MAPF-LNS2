@@ -34,6 +34,7 @@ InitLNS::InitLNS(const Instance &instance, vector<Agent> &agents, double time_li
 
 bool InitLNS::run() {
     start_time = Time::now();
+    // 초기솔루션을 구함.
     bool succ = getInitialSolution();
     runtime = ((fsec) (Time::now() - start_time)).count();
     iteration_stats.emplace_back(neighbor.agents.size(), sum_of_costs, runtime, "PP", 0, num_of_colliding_pairs);
@@ -53,11 +54,13 @@ bool InitLNS::run() {
     vector<Path *> paths(agents.size());
     for (auto i = 0; i < agents.size(); i++)
         paths[i] = &agents[i].path;
+    // 여기서 부터 LNS를 시작함.
     while (runtime < time_limit and num_of_colliding_pairs > 0) {
         assert(instance.validateSolution(paths, sum_of_costs, num_of_colliding_pairs));
         if (ALNS)
             chooseDestroyHeuristicbyALNS();
 
+        // 먼저 LNS 전략에 따라 neighborhood를 선택.
         switch (init_destroy_strategy) {
             case TARGET_BASED:
                 succ = generateNeighborByTarget();
@@ -126,6 +129,7 @@ bool InitLNS::run() {
             exit(-1);
         }
 
+        // path를 업데이트 후 destroy heuristics를 업데이트함.
         if (ALNS) // update destroy heuristics
         {
             if (neighbor.colliding_pairs.size() < neighbor.old_colliding_pairs.size())
@@ -303,6 +307,7 @@ bool InitLNS::runPP() {
         path_table.insertPath(agents[id].id, agents[id].path);
         ++p;
     }
+    // collision pair가 줄어야 새로운 path를 받아들임.
     if (p == shuffled_agents.end() &&
         neighbor.colliding_pairs.size() <= neighbor.old_colliding_pairs.size()) // accept new paths
     {
@@ -345,6 +350,7 @@ bool InitLNS::getInitialSolution() {
     }
     int remaining_agents = (int) neighbor.agents.size();
     std::random_shuffle(neighbor.agents.begin(), neighbor.agents.end());
+    // LNS와 다르게 path_table을 채워주는것이 아닌 Conflict Avoidance Table을 채워줌.
     ConstraintTable constraint_table(instance.num_of_cols, instance.map_size, nullptr, &path_table);
     set<pair<int, int>> colliding_pairs;
     for (auto id: neighbor.agents) {

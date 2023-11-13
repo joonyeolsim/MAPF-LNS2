@@ -49,6 +49,7 @@ bool LNS::run() {
     // 초기 solution을 구함
     bool succ = getInitialSolution();
     initial_solution_runtime = ((fsec) (Time::now() - start_time)).count();
+    // 일반적인 PP로 못구하면 LNS2로 구함. LNS는 PP임. 이 부분을 분리해서 사용 가능할듯.
     if (!succ && initial_solution_runtime < time_limit) {
         if (use_init_lns) {
             init_lns = new InitLNS(instance, agents, time_limit - initial_solution_runtime,
@@ -350,6 +351,7 @@ bool LNS::runPP() {
         if (neighbor.sum_of_costs >= neighbor.old_sum_of_costs)
             break;
         remaining_agents--;
+        // path_table에 추가함으로써 constraint_table을 업데이트
         path_table.insertPath(agents[id].id, agents[id].path);
         ++p;
     }
