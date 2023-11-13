@@ -4,3 +4,6 @@ bin
 cmake*
 exp*
 debug
+paths.txt
+test-LNS.csv
+test-initLNS.csv
