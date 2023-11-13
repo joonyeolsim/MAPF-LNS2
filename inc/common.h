@@ -10,6 +10,7 @@
 #include <iomanip>      // std::setprecision
 #include <chrono>
 #include <utility>
+#include "States.h"
 #include <boost/heap/pairing_heap.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/unordered_map.hpp>
@@ -45,13 +46,6 @@ typedef std::chrono::duration<float> fsec;
 #define MAX_TIMESTEP INT_MAX / 2
 #define MAX_COST INT_MAX / 2
 #define MAX_NODES INT_MAX / 2
-
-struct PathEntry {
-    int location = -1;
-    explicit PathEntry(int loc = -1) { location = loc; }
-};
-
-typedef vector<PathEntry> Path;
 
 std::ostream& operator<<(std::ostream&os, const Path&path);
 

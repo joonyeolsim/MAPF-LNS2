@@ -84,7 +84,7 @@ private:
     hashtable_t allNodes_table;
     list<SIPPNode *> useless_nodes;
 
-    void updatePath(const LLNode* goal, std::vector<PathEntry>&path);
+    void updatePath(const LLNode* goal, Path&path);
 
     inline void pushNodeToOpenAndFocal(SIPPNode* node);
 
