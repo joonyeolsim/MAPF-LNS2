@@ -196,7 +196,6 @@ bool ConstraintTable::hasConflictForStep(size_t curr_id, size_t next_id, int nex
 }
 
 bool ConstraintTable::hasEdgeConflict(size_t curr_id, size_t next_id, int next_timestep) const {
-    assert(curr_id != next_id);
     if (path_table_for_CAT != nullptr and path_table_for_CAT->hasEdgeCollisions(curr_id, next_id, next_timestep))
         return true;
     return !cat.empty() and curr_id != next_id and cat[next_id].size() >= next_timestep and

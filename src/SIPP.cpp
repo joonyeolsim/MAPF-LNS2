@@ -32,9 +32,6 @@ void SIPP::updatePath(const LLNode* goal, Path& path) {
 // Returns a path that minimizes the collisions with the paths in the path table, breaking ties by the length
 Path SIPP::findPath(const ConstraintTable&constraint_table) {
     reset();
-    //Path path = findNoCollisionPath(constraint_table);
-    //if (!path.empty())
-    //    return path;
     ReservationTable reservation_table(constraint_table, goal_location);
     Path path;
     Interval interval = reservation_table.get_first_safe_interval(start_location);
@@ -80,23 +77,23 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
                 delete goal;
         }
 
-        for (int next_location: instance.getNeighbors(curr->state.location)) // move to neighboring locations
+        for (auto &next_state: instance.getNeighbors(curr->state)) // move to neighboring locations
         {
             for (auto&i: reservation_table.get_safe_intervals(
-                     curr->state.location, next_location, curr->state.timestep + 1, curr->high_expansion + 1)) {
+                     curr->state.location, next_state.location, curr->state.timestep + 1, curr->high_expansion + 1)) {
                 int next_high_generation, next_timestep, next_high_expansion;
                 bool next_v_collision, next_e_collision;
                 tie(next_high_generation, next_timestep, next_high_expansion, next_v_collision, next_e_collision) = i;
-                if (next_timestep + my_heuristic[next_location] > constraint_table.length_max)
+                if (next_timestep + my_heuristic[next_state.location] > constraint_table.length_max)
                     break;
                 auto next_collisions = curr->num_of_conflicts +
                                        // (int)curr->collision_v * max(next_timestep - curr->state.timestep - 1, 0) + // wait time
                                        (int)next_v_collision + (int)next_e_collision;
-                auto next_h_val = max(my_heuristic[next_location],
+                auto next_h_val = max(my_heuristic[next_state.location],
                                       (next_collisions > 0 ? holding_time : curr->getFVal()) - next_timestep);
                 // path max
                 // generate (maybe temporary) node
-                auto next = new SIPPNode(State(next_location, next_timestep, 0), next_timestep, next_h_val, curr,
+                auto next = new SIPPNode(State(next_state.location, next_timestep, next_state.orientation), next_timestep, next_h_val, curr,
                                          next_high_generation, next_high_expansion, next_v_collision, next_collisions);
                 // try to retrieve it from the hash table
                 if (dominanceCheck(next))
@@ -115,7 +112,7 @@ Path SIPP::findPath(const ConstraintTable&constraint_table) {
             auto next_collisions = curr->num_of_conflicts +
                                    // (int)curr->collision_v * max(next_timestep - curr->state.timestep - 1, 0) +
                                    (int)get<2>(interval);
-            auto next = new SIPPNode(State(curr->state.location, next_timestep, 0), next_timestep, next_h_val, curr,
+            auto next = new SIPPNode(State(curr->state.location, next_timestep, curr->state.orientation), next_timestep, next_h_val, curr,
                                      get<1>(interval), get<1>(interval), get<2>(interval),
                                      next_collisions);
             next->wait_at_goal = (curr->state.location == goal_location);
@@ -145,24 +142,24 @@ int SIPP::getTravelTime(int start, int end, const ConstraintTable&constraint_tab
             length = curr->g_val;
             break;
         }
-        list<int> next_locations = instance.getNeighbors(curr->state.location);
-        next_locations.emplace_back(curr->state.location);
-        for (int next_location: next_locations) {
+        list<State> next_states = instance.getNeighbors(curr->state);
+        next_states.emplace_back(curr->state);
+        for (auto &next_state: next_states) {
             int next_timestep = curr->state.timestep + 1;
             int next_g_val = curr->g_val + 1;
             if (static_timestep <= curr->state.timestep) {
-                if (curr->state.location == next_location) {
+                if (curr->state == next_state) {
                     continue;
                 }
                 next_timestep--;
             }
-            if (!constraint_table.constrained(next_location, next_timestep) &&
-                !constraint_table.constrained(curr->state.location, next_location, next_timestep)) {
+            if (!constraint_table.constrained(next_state.location, next_timestep) &&
+                !constraint_table.constrained(curr->state.location, next_state.location, next_timestep)) {
                 // if that grid is not blocked
-                int next_h_val = compute_heuristic(next_location, end);
+                int next_h_val = compute_heuristic(next_state.location, end);
                 if (next_g_val + next_h_val >= upper_bound) // the cost of the path is larger than the upper bound
                     continue;
-                auto next = new SIPPNode(State(next_location, next_timestep, 0), next_g_val, next_h_val, nullptr,
+                auto next = new SIPPNode(State(next_state.location, next_g_val, next_state.orientation), next_g_val, next_h_val, nullptr,
                                          next_timestep + 1, next_timestep + 1, 0, 0);
                 if (dominanceCheck(next))
                     pushNodeToOpenAndFocal(next);

@@ -34,7 +34,10 @@ public:
     }
 
     list<int> getNeighbors(int curr) const;
-
+    list<State> getNeighbors(State curr_state) const;
+    int computeNextLocation(const State&curr) const;
+    int computeNextDirectionLeft(const State&curr) const;
+    int computeNextDirectionRight(const State&curr) const;
 
     inline int linearizeCoordinate(int row, int col) const { return (this->num_of_cols * row + col); }
     inline int getRowCoordinate(int id) const { return id / this->num_of_cols; }

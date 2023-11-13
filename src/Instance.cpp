@@ -440,6 +440,57 @@ list<int> Instance::getNeighbors(int curr) const {
     return neighbors;
 }
 
+enum Orientation {
+    EAST = 0,
+    SOUTH = 1,
+    WEST = 2,
+    NORTH = 3
+};
+
+list<State> Instance::getNeighbors(State curr_state) const {
+    list<State> neighbors;
+    vector<State> candidates;
+    // Add forward action
+    int next_location = computeNextLocation(curr_state);
+    candidates.emplace_back(next_location, curr_state.timestep + 1, curr_state.orientation);
+    // Add Left Rotation Action
+    int next_direction = computeNextDirectionLeft(curr_state);
+    candidates.emplace_back(curr_state.location, curr_state.timestep + 1, next_direction);
+    // Add Right Rotation Action
+    next_direction = computeNextDirectionRight(curr_state);
+    candidates.emplace_back(curr_state.location, curr_state.timestep + 1, next_direction);
+    for (auto&next: candidates) {
+        if (validMove(curr_state.location, next.location))
+            neighbors.emplace_back(next);
+    }
+    return neighbors;
+}
+
+int Instance::computeNextLocation(const State&curr) const {
+    int next_location = curr.location;
+    if (curr.orientation == EAST) {
+        next_location += 1;
+    }
+    else if (curr.orientation == SOUTH) {
+        next_location += num_of_cols;
+    }
+    else if (curr.orientation == WEST) {
+        next_location -= 1;
+    }
+    else if (curr.orientation == NORTH) {
+        next_location -= num_of_cols;
+    }
+    return next_location;
+}
+
+int Instance::computeNextDirectionLeft(const State&curr) const {
+    return (curr.orientation == EAST) ? NORTH : curr.orientation - 1;
+}
+
+int Instance::computeNextDirectionRight(const State&curr) const {
+    return (curr.orientation == NORTH) ? EAST : curr.orientation + 1;
+}
+
 void Instance::savePaths(const string&file_name, const vector<Path *>&paths) const {
     std::ofstream output;
     output.open(file_name);
