@@ -34,8 +34,6 @@ private:
 
 
     bool runPP();
-    bool runGCBS();
-    bool runPBS();
 
     bool updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int agent_id, const Path& path) const;
 

@@ -1,5 +1,4 @@
 #include "SingleAgentSolver.h"
-#include "SpaceTimeAStar.h"
 
 list<int> SingleAgentSolver::getNextLocations(int curr) const // including itself and its neighbors
 {

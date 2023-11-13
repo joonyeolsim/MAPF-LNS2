@@ -1,10 +1,8 @@
 ﻿#include <boost/program_options.hpp>
 #include <boost/tokenizer.hpp>
+#include "common.h"
 #include "LNS.h"
-#include "AnytimeBCBS.h"
-#include "AnytimeEECBS.h"
-#include "PIBT/pibt.h"
-
+#include "Instance.h"
 
 /* Main function */
 int main(int argc, char** argv)
@@ -97,26 +95,6 @@ int main(int argc, char** argv)
         if (vm.count("stats"))
             lns.writeIterStatsToFile(vm["stats"].as<string>());
         // lns.writePathsToFile("path.txt");
-    }
-    else if (vm["solver"].as<string>() == "A-BCBS") // anytime BCBS(w, 1)
-    {
-        AnytimeBCBS bcbs(instance, time_limit, screen);
-        bcbs.run();
-        bcbs.validateSolution();
-        if (vm.count("output"))
-            bcbs.writeResultToFile(vm["output"].as<string>() + ".csv");
-        if (vm.count("stats"))
-            bcbs.writeIterStatsToFile(vm["stats"].as<string>());
-    }
-    else if (vm["solver"].as<string>() == "A-EECBS") // anytime EECBS
-    {
-        AnytimeEECBS eecbs(instance, time_limit, screen);
-        eecbs.run();
-        eecbs.validateSolution();
-        if (vm.count("output"))
-            eecbs.writeResultToFile(vm["output"].as<string>() + ".csv");
-        if (vm.count("stats"))
-            eecbs.writeIterStatsToFile(vm["stats"].as<string>());
     }
 	else
     {

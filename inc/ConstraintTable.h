@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include "CBSNode.h"
 #include "PathTable.h"
 
 class ConstraintTable
@@ -40,8 +39,6 @@ public:
 	    landmarks.clear();
 	    cat.clear();
 	}
-	void insert2CT(const HLNode& node, int agent); // build the constraint table for the given agent at the give node
-	void insert2CT(const list<Constraint>& constraints, int agent); // insert constraints for the given agent to the constraint table
     void insert2CT(const Path& path); // insert a path to the constraint table
     void insert2CT(size_t loc, int t_min, int t_max); // insert a vertex constraint to the constraint table
     void insert2CT(size_t from, size_t to, int t_min, int t_max); // insert an edge constraint to the constraint table

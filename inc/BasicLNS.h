@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include "SpaceTimeAStar.h"
 #include "SIPP.h"
 
 struct Agent
@@ -11,10 +10,7 @@ struct Agent
 
     Agent(const Instance& instance, int id, bool sipp) : id(id)
     {
-        if(sipp)
-            path_planner = new SIPP(instance, id);
-        else
-            path_planner = new SpaceTimeAStar(instance, id);
+        path_planner = new SIPP(instance, id);
     }
     ~Agent(){ delete path_planner; }
 
