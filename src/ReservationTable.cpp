@@ -1,33 +1,6 @@
 #include "ReservationTable.h"
 
 
-/*int ResevationTable::get_holding_time(int location)
-{ 
-	auto it = constraints.find(location);
-	if (it != constraints.end())
-	{
-		for (auto constraint : it->second)
-			insert_constraint(location, constraint.first, constraint.second);
-	}
-	
-	if (RT.find(location) == RT.end()) 
-	{
-		return 0;
-	}
-	int t = std::get<1>(RT[location].back());
-	if (t < INTERVAL_MAX)
-		return INTERVAL_MAX;
-	for (auto p =  RT[location].rbegin(); p != RT[location].rend(); ++p)
-	{
-		if (t == std::get<1>(*p))
-			t = std::get<0>(*p);
-		else
-			break;
-	}
-	return t;
-}*/
-
-
 void ReservationTable::insert2SIT(int location, int t_min, int t_max)
 {
 	assert(t_min >= 0 and t_min < t_max and !sit[location].empty());
@@ -145,31 +118,6 @@ void ReservationTable::insertSoftConstraint2SIT(int location, int t_min, int t_m
         }
     }
 }
-
-
-//merge successive safe intervals with the same number of conflicts.
-/*void ReservationTable::mergeIntervals(list<Interval >& intervals) const
-{
-	if (intervals.empty())
-		return;
-	auto prev = intervals.begin();
-	auto curr = prev;
-	++curr;
-	while (curr != intervals.end())
-	{
-		if (get<1>(*prev) == get<0>(*curr) && get<2>(*prev) == get<2>(*curr))
-		{
-			*prev = make_tuple(get<0>(*prev), get<1>(*curr), get<2>(*prev));
-			curr = intervals.erase(curr);
-		}
-		else
-		{
-			prev = curr;
-			++curr;
-		}
-	}
-}*/ // we cannot merge intervals for goal locations seperated by length_min
-
 
 // update SIT at the given location
 void ReservationTable::updateSIT(int location)

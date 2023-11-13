@@ -135,7 +135,6 @@ protected:
     uint64_t num_generated = 0;
     uint64_t num_reopened = 0;
 	int min_f_val; // minimal f value in OPEN
-	// int lower_bound; // Threshold for FOCAL
 	double w = 1; // suboptimal bound
 
 	void compute_heuristics();

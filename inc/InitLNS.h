@@ -43,7 +43,6 @@ private:
     bool generateNeighborByTarget();
     bool generateNeighborRandomly();
 
-    // int findRandomAgent() const;
     int randomWalk(int agent_id);
 
     void printCollisionGraph() const;

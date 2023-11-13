@@ -3,11 +3,11 @@
 
 LNS::LNS(const Instance& instance, double time_limit, const string & init_algo_name, const string & replan_algo_name,
          const string & destory_name, int neighbor_size, int num_of_iterations, bool use_init_lns,
-         const string & init_destory_name, bool use_sipp, int screen, PIBTPPS_option pipp_option) :
+         const string & init_destory_name, bool use_sipp, int screen) :
          BasicLNS(instance, time_limit, neighbor_size, screen),
          init_algo_name(init_algo_name),  replan_algo_name(replan_algo_name), num_of_iterations(num_of_iterations),
          use_init_lns(use_init_lns),init_destory_name(init_destory_name),
-         path_table(instance.map_size), pipp_option(pipp_option)
+         path_table(instance.map_size)
 {
     start_time = Time::now();
     replan_time_limit = time_limit / 100;

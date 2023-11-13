@@ -334,9 +334,6 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
                 }
             }
         }
-        //auto id = getAgentWithTarget(to, t);
-        //if (id >= 0) // this agent traverses the target of another agent
-        //    colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));
         if (!path_table.goals.empty() && path_table.goals[to] < t) // target conflicts
         { // this agent traverses the target of another agent
             for (auto id : path_table.table[to][path_table.goals[to]]) // look at all agents at the goal time
@@ -376,54 +373,6 @@ void InitLNS::chooseDestroyHeuristicbyALNS()
 
 bool InitLNS::generateNeighborByCollisionGraph()
 {
-    /*unordered_map<int, list<int>> G;
-    for (int i = 0; i < (int)collision_graph.size(); i++)
-    {
-        if (!collision_graph[i].empty())
-            G[i].assign(collision_graph[i].begin(), collision_graph[i].end());
-    }
-    assert(!G.empty());
-    assert(neighbor_size <= (int)agents.size());
-    set<int> neighbors_set;
-    if ((int)G.size() < neighbor_size)
-    {
-        for (const auto& node : G)
-            neighbors_set.insert(node.first);
-        int count = 0;
-        while ((int)neighbors_set.size() < neighbor_size && count < 10)
-        {
-            int a1 = *std::next(neighbors_set.begin(), rand() % neighbors_set.size());
-            int a2 = randomWalk(a1);
-            if (a2 != NO_AGENT)
-                neighbors_set.insert(a2);
-            else
-                count++;
-        }
-    }
-    else
-    {
-        int a = -1;
-        while ((int)neighbors_set.size() < neighbor_size)
-        {
-            if (a == -1)
-            {
-                a = std::next(G.begin(), rand() % G.size())->first;
-                neighbors_set.insert(a);
-            }
-            else
-            {
-                a = *std::next(G[a].begin(), rand() % G[a].size());
-                auto ret = neighbors_set.insert(a);
-                if (!ret.second) // no new element inserted
-                    a = -1;
-            }
-        }
-    }
-    neighbor.agents.assign(neighbors_set.begin(), neighbors_set.end());
-    if (screen >= 2)
-        cout << "Generate " << neighbor.agents.size() << " neighbors by collision graph" << endl;
-    return true;*/
-
     vector<int> all_vertices;
     all_vertices.reserve(collision_graph.size());
     for (int i = 0; i < (int)collision_graph.size(); i++)

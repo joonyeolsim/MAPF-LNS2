@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <boost/functional/hash.hpp>
 #include "SingleAgentSolver.h"
 #include "ReservationTable.h"
 
@@ -19,8 +18,6 @@ public:
 	        bool collision_v, int num_of_conflicts) :
             LLNode(loc, g_val, h_val, parent, timestep, num_of_conflicts), high_generation(high_generation),
             high_expansion(high_expansion), collision_v(collision_v) {}
-	// SIPPNode(const SIPPNode& other): LLNode(other), high_generation(other.high_generation), high_expansion(other.high_expansion),
-        //                              collision_v(other.collision_v) {}
 	~SIPPNode() {}
 
 	void copy(const SIPPNode& other) // copy everything except for handles
@@ -63,13 +60,6 @@ public:
 class SIPP: public SingleAgentSolver
 {
 public:
-
-    // find path by SIPP
-	// Returns a shortest path that satisfies the constraints of the give node  while
-	// minimizing the number of internal conflicts (that is conflicts with known_paths for other agents found so far).
-	// lowerbound is an underestimation of the length of the path in order to speed up the search.
-    //Path findOptimalPath(const PathTable& path_table) {return Path(); } // TODO: To implement
-    //Path findOptimalPath(const ConstraintTable& constraint_table, const PathTableWC& path_table);
     Path findPath(const ConstraintTable& constraint_table); // return A path that minimizes collisions, breaking ties by cost
     int getTravelTime(int start, int end, const ConstraintTable& constraint_table, int upper_bound);
 
@@ -89,7 +79,6 @@ private:
 	typedef boost::unordered_map<SIPPNode*, list<SIPPNode*>, SIPPNode::NodeHasher, SIPPNode::eqnode> hashtable_t;
     hashtable_t allNodes_table;
     list<SIPPNode*> useless_nodes;
-    // Path findNoCollisionPath(const ConstraintTable& constraint_table);
 
     void updatePath(const LLNode* goal, std::vector<PathEntry> &path);
 

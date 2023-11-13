@@ -22,7 +22,7 @@ public:
     LNS(const Instance& instance, double time_limit,
         const string & init_algo_name, const string & replan_algo_name, const string & destory_name,
         int neighbor_size, int num_of_iterations, bool init_lns, const string & init_destory_name, bool use_sipp,
-        int screen, PIBTPPS_option pipp_option);
+        int screen);
     ~LNS()
     {
         delete init_lns;
@@ -42,7 +42,6 @@ private:
     destroy_heuristic destroy_strategy = RANDOMWALK;
     int num_of_iterations;
     string init_destory_name;
-    PIBTPPS_option pipp_option;
 
 
     PathTable path_table; // 1. stores the paths of all agents in a time-space table;

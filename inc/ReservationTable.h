@@ -23,7 +23,6 @@ private:
     SIT sit; // location -> [t_min, t_max), num_of_collisions
     void insert2SIT(int location, int t_min, int t_max);
     void insertSoftConstraint2SIT(int location, int t_min, int t_max);
-	// void mergeIntervals(list<Interval >& intervals) const;
 	void updateSIT(int location); // update SIT at the given location
     int get_earliest_arrival_time(int from, int to, int lower_bound, int upper_bound) const;
     int get_earliest_no_collision_arrival_time(int from, int to, const Interval& interval,

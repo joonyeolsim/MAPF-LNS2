@@ -57,10 +57,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-    PIBTPPS_option pipp_option;
-    pipp_option.windowSize = vm["pibtWindow"].as<int>();
-    pipp_option.winPIBTSoft = vm["winPibtSoftmode"].as<bool>();
-
     po::notify(vm);
 
 	srand((int)time(0));
@@ -82,7 +78,7 @@ int main(int argc, char** argv)
                 vm["initLNS"].as<bool>(),
                 vm["initDestoryStrategy"].as<string>(),
                 vm["sipp"].as<bool>(),
-                screen, pipp_option);
+                screen);
         bool succ = lns.run();
         if (succ)
         {
