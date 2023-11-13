@@ -47,9 +47,9 @@ typedef std::chrono::duration<float> fsec;
 #define MAX_COST INT_MAX / 2
 #define MAX_NODES INT_MAX / 2
 
-std::ostream& operator<<(std::ostream&os, const Path&path);
-
-bool isSamePath(const Path&p1, const Path&p2);
+// std::ostream& operator<<(std::ostream&os, const Path&path);
+//
+// bool isSamePath(const Path&p1, const Path&p2);
 
 struct IterationStats {
     int sum_of_costs;
