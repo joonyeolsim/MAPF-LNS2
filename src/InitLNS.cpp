@@ -9,7 +9,7 @@ InitLNS::InitLNS(const Instance& instance, vector<Agent>& agents, double time_li
     : BasicLNS(instance, time_limit, neighbor_size, screen),
       agents(agents),
       replan_algo_name(replan_algo_name),
-      path_table(instance.map_size, agents.size()),
+      path_table(instance.window, instance.map_size, agents.size()),
       collision_graph(agents.size()),
       goal_table(instance.map_size, -1) {
   replan_time_limit = time_limit;
@@ -277,7 +277,7 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
                                    const Path& path) const {
   bool succ = false;
   if (path.size() < 2) return succ;
-  for (int t = 1; t < min((int)path.size(), window); t++) {
+  for (int t = 1; t < min((int)path.size(), instance.window); t++) {
     int from = path[t - 1].location;
     int to = path[t].location;
     if ((int)path_table.table[to].size() > t)  // vertex conflicts
@@ -319,7 +319,7 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
   int goal =
       path.back()
           .location;  // target conflicts - some other agent traverses the target of this agent
-  for (int t = (int)path.size(); t < min((int)path_table.table[goal].size(), window); t++) {
+  for (int t = (int)path.size(); t < min((int)path_table.table[goal].size(), instance.window); t++) {
     for (auto id : path_table.table[goal][t]) {
       succ = true;
       colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));

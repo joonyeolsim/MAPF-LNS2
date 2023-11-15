@@ -6,12 +6,13 @@ typedef tuple<int, int, bool> Interval;  // [t_min, t_max), has collision
 
 class ReservationTable {
  public:
-  int window = 5;
+  int window;
   const ConstraintTable& constraint_table;
 
-  ReservationTable(const ConstraintTable& constraint_table, int goal_location)
+  ReservationTable(const ConstraintTable& constraint_table, int goal_location, int window)
       : constraint_table(constraint_table),
         goal_location(goal_location),
+        window(window),
         sit(constraint_table.map_size) {}
 
   list<tuple<int, int, int, bool, bool>> get_safe_intervals(int from, int to, int lower_bound,

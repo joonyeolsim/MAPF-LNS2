@@ -5,7 +5,6 @@ enum init_destroy_heuristic { TARGET_BASED, COLLISION_BASED, RANDOM_BASED, INIT_
 
 class InitLNS : public BasicLNS {
  public:
-  int window = 5;
   vector<Agent>& agents;
   int num_of_colliding_pairs = 0;
 

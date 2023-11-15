@@ -5,7 +5,7 @@
 
 class PathTable {
  public:
-  int window = 5;
+  int window;
   int makespan = 0;
   vector<vector<int>>
       table;  // this stores the collision-free paths, the value is the id of the agent
@@ -36,13 +36,13 @@ class PathTable {
 
   int getHoldingTime(int location, int earliest_timestep) const;
 
-  explicit PathTable(int map_size = 0) : table(map_size), goals(map_size, MAX_COST) {}
+  explicit PathTable(int window, int map_size = 0) : window(window), table(map_size), goals(map_size, MAX_COST) {}
 };
 
 class PathTableWC  // with collisions
 {
  public:
-  int window = 5;
+  int window;
   int makespan = 0;
   vector<vector<list<int>>> table;  // this stores the paths, the value is the id of the agent
   vector<int> goals;
@@ -80,8 +80,8 @@ class PathTableWC  // with collisions
 
   void clear();
 
-  explicit PathTableWC(int map_size = 0, int num_of_agents = 0)
-      : table(map_size), goals(map_size, MAX_COST), paths(num_of_agents, nullptr) {}
+  explicit PathTableWC(int window, int map_size = 0, int num_of_agents = 0)
+      : window(window), table(map_size), goals(map_size, MAX_COST), paths(num_of_agents, nullptr) {}
 
  private:
   vector<const Path*> paths;

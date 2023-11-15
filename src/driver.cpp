@@ -57,7 +57,8 @@ int main(int argc, char** argv) {
 
   srand((int)time(0));
 
-  Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(), vm["agentNum"].as<int>());
+  int window = 10;
+  Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(), window, vm["agentNum"].as<int>());
   double time_limit = vm["cutoffTime"].as<double>();
   int screen = vm["screen"].as<int>();
   srand(vm["seed"].as<int>());

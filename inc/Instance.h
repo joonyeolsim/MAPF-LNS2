@@ -4,14 +4,14 @@
 // Currently only works for undirected unweighted 4-nighbor grids
 class Instance {
  public:
-  int window = 5;
+  int window;
   int num_of_cols;
   int num_of_rows;
   int map_size;
 
   Instance() = default;
 
-  Instance(const string &map_fname, const string &agent_fname, int num_of_agents = 0,
+  Instance(const string &map_fname, const string &agent_fname, int window, int num_of_agents = 0,
            int num_of_rows = 0, int num_of_cols = 0, int num_of_obstacles = 0,
            int warehouse_width = 0);
 

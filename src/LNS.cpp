@@ -12,7 +12,7 @@ LNS::LNS(const Instance& instance, double time_limit, const string& init_algo_na
       num_of_iterations(num_of_iterations),
       use_init_lns(use_init_lns),
       init_destory_name(init_destory_name),
-      path_table(instance.map_size) {
+      path_table(instance.window, instance.map_size) {
   start_time = Time::now();
   replan_time_limit = time_limit / 100;
   if (destory_name == "Adaptive") {
@@ -436,7 +436,7 @@ void LNS::validateSolution() const {
       const auto& a1 = a1_.path.size() <= a2_.path.size() ? a1_ : a2_;
       const auto& a2 = a1_.path.size() <= a2_.path.size() ? a2_ : a1_;
       int t = 1;
-      for (; t < min((int)a1.path.size(), window); t++) {
+      for (; t < min((int)a1.path.size(), instance.window); t++) {
         if (a1.path[t].location == a2.path[t].location)  // vertex conflict
         {
           cerr << "Find a vertex conflict between agents " << a1.id << " and " << a2.id
@@ -452,7 +452,7 @@ void LNS::validateSolution() const {
         }
       }
       int target = a1.path.back().location;
-      for (; t < min((int)a2.path.size(), window); t++) {
+      for (; t < min((int)a2.path.size(), instance.window); t++) {
         if (a2.path[t].location == target)  // target conflict
         {
           cerr << "Find a target conflict where agent " << a2.id << " (of length "

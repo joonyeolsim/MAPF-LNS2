@@ -32,7 +32,7 @@ void SIPP::updatePath(const LLNode* goal, Path& path) {
 // the length
 Path SIPP::findPath(const ConstraintTable& constraint_table) {
   reset();
-  ReservationTable reservation_table(constraint_table, goal_location);
+  ReservationTable reservation_table(constraint_table, goal_location, instance.window);
   Path path;
   Interval interval = reservation_table.get_first_safe_interval(start_state.location);
   if (get<0>(interval) > 0) return path;
