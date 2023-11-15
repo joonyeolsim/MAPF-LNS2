@@ -131,7 +131,7 @@ void ReservationTable::updateSIT(int location) {
           insert2SIT(location, t, t + 1);
         }
       }
-      if (constraint_table.path_table_for_CT->goals[location] < MAX_TIMESTEP)  // target conflict
+      if (constraint_table.path_table_for_CT->goals[location] < window)  // target conflict
         insert2SIT(location, constraint_table.path_table_for_CT->goals[location], MAX_TIMESTEP + 1);
     } else  // edge conflict
     {
@@ -176,7 +176,7 @@ void ReservationTable::updateSIT(int location) {
           insertSoftConstraint2SIT(location, t, t + 1);
         }
       }
-      if (constraint_table.path_table_for_CAT->goals[location] < MAX_TIMESTEP)  // target conflict
+      if (constraint_table.path_table_for_CAT->goals[location] < window)  // target conflict
         insertSoftConstraint2SIT(location, constraint_table.path_table_for_CAT->goals[location],
                                  MAX_TIMESTEP + 1);
     } else  // edge conflict

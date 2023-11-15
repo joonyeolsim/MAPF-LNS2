@@ -5,6 +5,7 @@
 
 class PathTable {
  public:
+  int window = 5;
   int makespan = 0;
   vector<vector<int>>
       table;  // this stores the collision-free paths, the value is the id of the agent
@@ -41,6 +42,7 @@ class PathTable {
 class PathTableWC  // with collisions
 {
  public:
+  int window = 5;
   int makespan = 0;
   vector<vector<list<int>>> table;  // this stores the paths, the value is the id of the agent
   vector<int> goals;
