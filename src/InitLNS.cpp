@@ -399,8 +399,8 @@ bool InitLNS::generateNeighborByTarget() {
   set<pair<int, int>> A_start;  // an ordered set of (time, id) pair.
   set<int> A_target;
 
-  for (int t = 0; t < path_table.table[agents[a].path_planner->start_location].size(); t++) {
-    for (auto id : path_table.table[agents[a].path_planner->start_location][t]) {
+  for (int t = 0; t < path_table.table[agents[a].path_planner->start_state.location].size(); t++) {
+    for (auto id : path_table.table[agents[a].path_planner->start_state.location][t]) {
       if (id != a) A_start.insert(make_pair(t, id));
     }
   }

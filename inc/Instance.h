@@ -18,7 +18,7 @@ class Instance {
   void printAgents() const;
 
   string getMapFile() const { return map_fname; };
-  vector<int> getStarts() const { return start_locations; };
+  vector<State> getStarts() const { return start_states; };
   vector<int> getGoals() const { return goal_locations; };
 
   inline bool isObstacle(int loc) const { return my_map[loc]; }
@@ -82,7 +82,7 @@ class Instance {
   string agent_fname;
 
   int num_of_agents;
-  vector<int> start_locations;
+  vector<State> start_states;
   vector<int> goal_locations;
 
   bool nathan_benchmark = true;

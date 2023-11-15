@@ -42,7 +42,7 @@ bool LNS::run() {
   // only for statistic analysis, and thus is not included in runtime
   sum_of_distances = 0;
   for (const auto& agent : agents) {
-    sum_of_distances += agent.path_planner->my_heuristic[agent.path_planner->start_location];
+    sum_of_distances += agent.path_planner->my_heuristic[agent.path_planner->start_state.location];
   }
 
   initial_solution_runtime = 0;
@@ -192,7 +192,7 @@ bool LNS::runPP() {
   if (screen >= 2) {
     for (auto id : shuffled_agents)
       cout << id << "("
-           << agents[id].path_planner->my_heuristic[agents[id].path_planner->start_location] << "->"
+           << agents[id].path_planner->my_heuristic[agents[id].path_planner->start_state.location] << "->"
            << agents[id].path.size() - 1 << "), ";
     cout << endl;
   }
@@ -342,7 +342,7 @@ bool LNS::generateNeighborByRandomWalk() {
   neighbor.agents.assign(neighbors_set.begin(), neighbors_set.end());
   if (screen >= 2)
     cout << "Generate " << neighbor.agents.size() << " neighbors by random walks of agent " << a
-         << "(" << agents[a].path_planner->my_heuristic[agents[a].path_planner->start_location]
+         << "(" << agents[a].path_planner->my_heuristic[agents[a].path_planner->start_state.location]
          << "->" << agents[a].path.size() - 1 << ")" << endl;
 
   return true;
@@ -411,10 +411,10 @@ void LNS::validateSolution() const {
     if (a1_.path.empty()) {
       cerr << "No solution for agent " << a1_.id << endl;
       exit(-1);
-    } else if (a1_.path_planner->start_location != a1_.path.front().location) {
+    } else if (a1_.path_planner->start_state.location != a1_.path.front().location) {
       cerr << "The path of agent " << a1_.id << " starts from location "
            << a1_.path.front().location << ", which is different from its start location "
-           << a1_.path_planner->start_location << endl;
+           << a1_.path_planner->start_state.location << endl;
       exit(-1);
     } else if (a1_.path_planner->goal_location != a1_.path.back().location) {
       cerr << "The path of agent " << a1_.id << " ends at location " << a1_.path.back().location

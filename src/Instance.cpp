@@ -56,7 +56,7 @@ void Instance::generateRandomAgents(int warehouse_width) {
   cout << "Generate " << num_of_agents << " random start and goal locations " << endl;
   vector<bool> starts(map_size, false);
   vector<bool> goals(map_size, false);
-  start_locations.resize(num_of_agents);
+  start_states.resize(num_of_agents);
   goal_locations.resize(num_of_agents);
 
   if (warehouse_width == 0)  // Generate agents randomly
@@ -84,7 +84,7 @@ void Instance::generateRandomAgents(int warehouse_width) {
           goal = randomWalk(goal, 1);*/
 
       // update start
-      start_locations[k] = start;
+      start_states[k] = start;
       starts[start] = true;
       // update goal
       goal_locations[k] = goal;
@@ -102,7 +102,7 @@ void Instance::generateRandomAgents(int warehouse_width) {
       int start = linearizeCoordinate(x, y);
       if (starts[start]) continue;
       // update start
-      start_locations[k] = start;
+      start_states[k] = start;
       starts[start] = true;
 
       k++;
@@ -308,7 +308,7 @@ bool Instance::loadAgents() {
       cerr << "The number of agents should be larger than 0" << endl;
       exit(-1);
     }
-    start_locations.resize(num_of_agents);
+    start_states.resize(num_of_agents);
     goal_locations.resize(num_of_agents);
     char_separator<char> sep("\t");
     for (int i = 0; i < num_of_agents; i++) {
@@ -327,7 +327,7 @@ bool Instance::loadAgents() {
       int col = atoi((*beg).c_str());
       beg++;
       int row = atoi((*beg).c_str());
-      start_locations[i] = linearizeCoordinate(row, col);
+      start_states[i] = linearizeCoordinate(row, col);
       // read goal [row,col] for agent i
       beg++;
       col = atoi((*beg).c_str());
@@ -341,7 +341,7 @@ bool Instance::loadAgents() {
     tokenizer<char_separator<char>> tok(line, sep);
     tokenizer<char_separator<char>>::iterator beg = tok.begin();
     num_of_agents = atoi((*beg).c_str());
-    start_locations.resize(num_of_agents);
+    start_states.resize(num_of_agents);
     goal_locations.resize(num_of_agents);
     for (int i = 0; i < num_of_agents; i++) {
       getline(myfile, line);
@@ -352,7 +352,7 @@ bool Instance::loadAgents() {
       int row = atoi((*c_beg).c_str());
       c_beg++;
       int col = atoi((*c_beg).c_str());
-      start_locations[i] = linearizeCoordinate(row, col);
+      start_states[i] = linearizeCoordinate(row, col);
       // read goal [row,col] for agent i
       c_beg++;
       row = atoi((*c_beg).c_str());
@@ -367,8 +367,8 @@ bool Instance::loadAgents() {
 
 void Instance::printAgents() const {
   for (int i = 0; i < num_of_agents; i++) {
-    cout << "Agent" << i << " : S=(" << getRowCoordinate(start_locations[i]) << ","
-         << getColCoordinate(start_locations[i]) << ") ; G=(" << getRowCoordinate(goal_locations[i])
+    cout << "Agent" << i << " : S=(" << getRowCoordinate(start_states[i].location) << ","
+         << getColCoordinate(start_states[i].location) << ") ; G=(" << getRowCoordinate(goal_locations[i])
          << "," << getColCoordinate(goal_locations[i]) << ")" << endl;
   }
 }
@@ -382,7 +382,7 @@ void Instance::saveAgents() const {
   }
   myfile << num_of_agents << endl;
   for (int i = 0; i < num_of_agents; i++)
-    myfile << getRowCoordinate(start_locations[i]) << "," << getColCoordinate(start_locations[i])
+    myfile << getRowCoordinate(start_states[i].location) << "," << getColCoordinate(start_states[i].location)
            << "," << getRowCoordinate(goal_locations[i]) << ","
            << getColCoordinate(goal_locations[i]) << "," << endl;
   myfile.close();
@@ -398,8 +398,8 @@ void Instance::saveNathan() const {
   myfile << "version 1" << endl;
   for (int i = 0; i < num_of_agents; i++)
     myfile << i << "\t" << map_fname << "\t" << this->num_of_cols << "\t" << this->num_of_rows
-           << "\t" << getColCoordinate(start_locations[i]) << "\t"
-           << getRowCoordinate(start_locations[i]) << "\t" << getColCoordinate(goal_locations[i])
+           << "\t" << getColCoordinate(start_states[i].location) << "\t"
+           << getRowCoordinate(start_states[i].location) << "\t" << getColCoordinate(goal_locations[i])
            << "\t" << getRowCoordinate(goal_locations[i]) << "\t" << 0 << endl;
   myfile.close();
 }
@@ -477,18 +477,18 @@ void Instance::savePaths(const string &file_name, const vector<Path *> &paths) c
 bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
                                 int num_of_colliding_pairs) const {
   cout << "Validate solution ..." << endl;
-  if (paths.size() != start_locations.size()) {
-    cerr << "We have " << paths.size() << " for " << start_locations.size() << " agents." << endl;
+  if (paths.size() != start_states.size()) {
+    cerr << "We have " << paths.size() << " for " << start_states.size() << " agents." << endl;
     exit(-1);
   }
   int sum = 0;
-  for (auto i = 0; i < start_locations.size(); i++) {
+  for (auto i = 0; i < start_states.size(); i++) {
     if (paths[i] == nullptr or paths[i]->empty()) {
       cerr << "No path for agent " << i << endl;
       exit(-1);
-    } else if (start_locations[i] != paths[i]->front().location) {
+    } else if (start_states[i] != paths[i]->front().location) {
       cerr << "The path of agent " << i << " starts from location " << paths[i]->front().location
-           << ", which is different from its start location " << start_locations[i] << endl;
+           << ", which is different from its start location " << start_states[i] << endl;
       exit(-1);
     } else if (goal_locations[i] != paths[i]->back().location) {
       cerr << "The path of agent " << i << " ends at location " << paths[i]->back().location
@@ -512,8 +512,8 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
   }
   // check for colliions
   int collisions = 0;
-  for (auto i = 0; i < start_locations.size(); i++) {
-    for (auto j = i + 1; j < start_locations.size(); j++) {
+  for (auto i = 0; i < start_states.size(); i++) {
+    for (auto j = i + 1; j < start_states.size(); j++) {
       bool found_collision = false;
       const auto a1 = paths[i]->size() <= paths[j]->size() ? i : j;
       const auto a2 = paths[i]->size() <= paths[j]->size() ? j : i;

@@ -89,7 +89,7 @@ class SingleAgentSolver {
   double runtime_build_CT = 0;   // runtimr of building constraint table
   double runtime_build_CAT = 0;  // runtime of building conflict avoidance table
 
-  int start_location;
+  State start_state;
   int goal_location;
   vector<int> my_heuristic;  // this is the precomputed heuristic for this agent
   int compute_heuristic(int from,
@@ -111,12 +111,12 @@ class SingleAgentSolver {
   list<int> getNextLocations(int curr) const;  // including itself and its neighbors
   list<int> getNeighbors(int curr) const { return instance.getNeighbors(curr); }
   uint64_t getNumExpanded() const { return num_expanded; }
-  // int getStartLocation() const {return instance.start_locations[agent]; }
+  // int getStartLocation() const {return instance.start_states[agent]; }
   // int getGoalLocation() const {return instance.goal_locations[agent]; }
 
   SingleAgentSolver(const Instance& instance, int agent)
       : instance(instance),  // agent(agent),
-        start_location(instance.start_locations[agent]),
+        start_state(instance.start_states[agent]),
         goal_location(instance.goal_locations[agent]) {
     compute_heuristics();
   }

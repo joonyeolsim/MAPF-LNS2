@@ -34,13 +34,13 @@ Path SIPP::findPath(const ConstraintTable& constraint_table) {
   reset();
   ReservationTable reservation_table(constraint_table, goal_location);
   Path path;
-  Interval interval = reservation_table.get_first_safe_interval(start_location);
+  Interval interval = reservation_table.get_first_safe_interval(start_state.location);
   if (get<0>(interval) > 0) return path;
   auto holding_time = constraint_table.getHoldingTime(goal_location, constraint_table.length_min);
   auto last_target_collision_time = constraint_table.getLastCollisionTimestep(goal_location);
   // generate start and add it to the OPEN & FOCAL list
-  auto h = max(max(my_heuristic[start_location], holding_time), last_target_collision_time + 1);
-  auto start = new SIPPNode(State(start_location, 0, 0), 0, h, nullptr, get<1>(interval),
+  auto h = max(max(my_heuristic[start_state.location], holding_time), last_target_collision_time + 1);
+  auto start = new SIPPNode(State(start_state.location, 0, 0), 0, h, nullptr, get<1>(interval),
                             get<1>(interval), get<2>(interval), get<2>(interval));
   pushNodeToFocal(start);
 
