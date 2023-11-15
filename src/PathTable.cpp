@@ -2,7 +2,7 @@
 
 void PathTable::insertPath(int agent_id, const Path& path) {
   if (path.empty()) return;
-  for (int t = 0; t < (int)path.size(); t++) {
+  for (int t = 0; t < min((int)path.size(), window); t++) {
     if (table[path[t].location].size() <= t) table[path[t].location].resize(t + 1, NO_AGENT);
     // assert(table[path[t].location][t] == NO_AGENT);
     table[path[t].location][t] = agent_id;
@@ -14,7 +14,7 @@ void PathTable::insertPath(int agent_id, const Path& path) {
 
 void PathTable::deletePath(int agent_id, const Path& path) {
   if (path.empty()) return;
-  for (int t = 0; t < (int)path.size(); t++) {
+  for (int t = 0; t < min((int)path.size(), window); t++) {
     // assert(table[path[t].location].size() > t && table[path[t].location][t] == agent_id);
     assert(table[path[t].location].size() > t);
     assert(table[path[t].location][t] == agent_id);
@@ -39,7 +39,7 @@ bool PathTable::constrained(int from, int to, int to_time) const {
       return true;  // edge conflict with agent table[to][to_time - 1]
   }
   if (!goals.empty()) {
-    if (goals[to] <= to_time) return true;  // target conflict
+    if (goals[to] < window && goals[to] <= to_time) return true;  // target conflict
   }
   return false;
 }
@@ -94,7 +94,7 @@ int PathTable::getHoldingTime(int location, int earliest_timestep = 0) const {
 void PathTableWC::insertPath(int agent_id, const Path& path) {
   paths[agent_id] = &path;
   if (path.empty()) return;
-  for (int t = 0; t < (int)path.size(); t++) {
+  for (int t = 0; t < min((int)path.size(), window); t++) {
     if (table[path[t].location].size() <= t) table[path[t].location].resize(t + 1);
     table[path[t].location][t].push_back(agent_id);
   }
@@ -111,7 +111,7 @@ void PathTableWC::insertPath(int agent_id) {
 void PathTableWC::deletePath(int agent_id) {
   const Path& path = *paths[agent_id];
   if (path.empty()) return;
-  for (int t = 0; t < (int)path.size(); t++) {
+  for (int t = 0; t < min((int)path.size(), window); t++) {
     assert(table[path[t].location].size() > t &&
            std::find(table[path[t].location][t].begin(), table[path[t].location][t].end(),
                      agent_id) != table[path[t].location][t].end());
@@ -131,7 +131,7 @@ int PathTableWC::getFutureNumOfCollisions(int loc, int time) const {
   assert(goals[loc] == MAX_TIMESTEP);
   int rst = 0;
   if (!table.empty() && (int)table[loc].size() > time) {
-    for (int t = time + 1; t < (int)table[loc].size(); t++)
+    for (int t = time + 1; t < min((int)table[loc].size(), window); t++)
       rst += (int)table[loc][t].size();  // vertex conflict
   }
   return rst;

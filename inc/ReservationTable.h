@@ -6,6 +6,7 @@ typedef tuple<int, int, bool> Interval;  // [t_min, t_max), has collision
 
 class ReservationTable {
  public:
+  int window = 5;
   const ConstraintTable& constraint_table;
 
   ReservationTable(const ConstraintTable& constraint_table, int goal_location)

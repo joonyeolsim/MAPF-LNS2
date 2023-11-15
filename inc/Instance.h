@@ -4,6 +4,7 @@
 // Currently only works for undirected unweighted 4-nighbor grids
 class Instance {
  public:
+  int window = 5;
   int num_of_cols;
   int num_of_rows;
   int map_size;

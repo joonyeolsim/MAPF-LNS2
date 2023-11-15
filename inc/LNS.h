@@ -10,6 +10,7 @@ enum destroy_heuristic { RANDOMAGENTS, RANDOMWALK, INTERSECTION, DESTORY_COUNT }
 
 class LNS : public BasicLNS {
  public:
+  int window = 5;
   vector<Agent> agents;
   double preprocessing_time = 0;
   double initial_solution_runtime = 0;

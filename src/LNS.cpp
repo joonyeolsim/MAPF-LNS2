@@ -436,7 +436,7 @@ void LNS::validateSolution() const {
       const auto& a1 = a1_.path.size() <= a2_.path.size() ? a1_ : a2_;
       const auto& a2 = a1_.path.size() <= a2_.path.size() ? a2_ : a1_;
       int t = 1;
-      for (; t < (int)a1.path.size(); t++) {
+      for (; t < min((int)a1.path.size(), window); t++) {
         if (a1.path[t].location == a2.path[t].location)  // vertex conflict
         {
           cerr << "Find a vertex conflict between agents " << a1.id << " and " << a2.id
@@ -452,7 +452,7 @@ void LNS::validateSolution() const {
         }
       }
       int target = a1.path.back().location;
-      for (; t < (int)a2.path.size(); t++) {
+      for (; t < min((int)a2.path.size(), window); t++) {
         if (a2.path[t].location == target)  // target conflict
         {
           cerr << "Find a target conflict where agent " << a2.id << " (of length "

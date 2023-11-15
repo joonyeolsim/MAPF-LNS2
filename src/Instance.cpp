@@ -518,7 +518,7 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
       const auto a1 = paths[i]->size() <= paths[j]->size() ? i : j;
       const auto a2 = paths[i]->size() <= paths[j]->size() ? j : i;
       int t = 1;
-      for (; t < (int)paths[a1]->size(); t++) {
+      for (; t < min((int)paths[a1]->size(), window); t++) {
         if (paths[a1]->at(t).location == paths[a2]->at(t).location)  // vertex conflict
         {
           if (num_of_colliding_pairs == 0) {
@@ -545,7 +545,7 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
       }
       if (!found_collision) {
         auto target = paths[a1]->back().location;
-        for (; t < (int)paths[a2]->size(); t++) {
+        for (; t < min((int)paths[a2]->size(), window); t++) {
           if (paths[a2]->at(t).location == target)  // target conflict
           {
             if (num_of_colliding_pairs == 0) {
