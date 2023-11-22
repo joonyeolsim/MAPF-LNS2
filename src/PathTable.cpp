@@ -39,7 +39,7 @@ bool PathTable::constrained(int from, int to, int to_time) const {
       return true;  // edge conflict with agent table[to][to_time - 1]
   }
   if (!goals.empty()) {
-    if (goals[to] < window && goals[to] <= to_time) return true;  // target conflict
+    if (goals[to] <= to_time && to_time < window) return true;  // target conflict
   }
   return false;
 }
@@ -150,7 +150,7 @@ int PathTableWC::getNumOfCollisions(int from, int to, int to_time) const {
     }
   }
   if (!goals.empty()) {
-    if (goals[to] < to_time) rst++;  // target conflict
+    if (goals[to] < to_time && to_time < window) rst++;  // target conflict
   }
   return rst;
 }
@@ -168,7 +168,7 @@ bool PathTableWC::hasCollisions(int from, int to, int to_time) const {
     }
   }
   if (!goals.empty()) {
-    if (goals[to] < to_time) return true;  // target conflict
+    if (goals[to] < to_time && to_time < window) return true;  // target conflict
   }
   return false;
 }
