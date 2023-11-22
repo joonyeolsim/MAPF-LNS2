@@ -28,7 +28,7 @@ Instance::Instance(const string &map_fname, const string &agent_fname, int windo
     if (num_of_agents > 0) {
       generateRandomAgents(warehouse_width);
       // saveAgents();
-      saveNathan();
+      // saveNathan();
     } else {
       cerr << "Agent file " << agent_fname << " not found." << endl;
       exit(-1);

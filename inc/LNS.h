@@ -41,6 +41,15 @@ class LNS : public BasicLNS {
     return "LNS(" + init_algo_name + ";" + replan_algo_name + ")";
   }
 
+  void clear() {
+    for (auto agent: agents) {
+      agent.path.clear();
+    }
+    path_table.reset();
+    tabu_list.clear();
+    intersections.clear();
+  }
+
  private:
   InitLNS* init_lns = nullptr;
   string init_algo_name;

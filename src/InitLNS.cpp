@@ -285,6 +285,18 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
       for (auto id : path_table.table[to][t]) {
         succ = true;
         colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));
+        cout << "Vertex conflict: " << agent_id << " and " << id << " at " << to << " at time " << t
+             << endl;
+        cout << "Agent " << agent_id << ": ";
+        for (int i = 0; i < instance.window; i++) {
+          cout << "(" << path[i] << ")->";
+        }
+        cout << endl;
+        cout << "Agent " << id << ": ";
+        for (int i = 0; i < instance.window; i++) {
+          cout << "(" << agents[id].path[i] << ")->";
+        }
+        cout << endl;
       }
     }
     if (from != to && path_table.table[to].size() >= t &&
@@ -295,6 +307,18 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
           if (a1 == a2) {
             succ = true;
             colliding_pairs.emplace(min(agent_id, a1), max(agent_id, a1));
+            cout << "Edge conflict: " << agent_id << " and " << a1 << " at " << to << " at time " << t
+                 << endl;
+            cout << "Agent " << agent_id << ": ";
+            for (int i = 0; i < instance.window; i++) {
+              cout << "(" << path[i] << ")->";
+            }
+            cout << endl;
+            cout << "Agent " << a1 << ": ";
+            for (int i = 0; i < instance.window; i++) {
+              cout << "(" << agents[a1].path[i] << ")->";
+            }
+            cout << endl;
             break;
           }
         }
@@ -311,6 +335,8 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
         {
           succ = true;
           colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));
+          cout << "Target conflict: " << agent_id << " and " << id << " at " << to << " at time "
+               << path_table.goals[to] << endl;
           break;
         }
       }
@@ -323,6 +349,8 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
     for (auto id : path_table.table[goal][t]) {
       succ = true;
       colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));
+      cout << "Target conflict: " << agent_id << " and " << id << " at " << goal << " at time " << t
+           << endl;
     }
   }
   return succ;
