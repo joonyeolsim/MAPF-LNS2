@@ -205,6 +205,11 @@ bool LNS::runPP() {
     T = min(T, replan_time_limit);
   auto time = Time::now();
   ConstraintTable constraint_table(instance.num_of_cols, instance.map_size, &path_table);
+  vector<Path> paths;
+  paths.resize(agents.size());
+  for (int i = 0; i < agents.size(); i++) {
+    paths[i] = agents[i].path;
+  }
   while (p != shuffled_agents.end() && ((fsec)(Time::now() - time)).count() < T) {
     int id = *p;
     if (screen >= 3)
@@ -212,7 +217,8 @@ bool LNS::runPP() {
            << ", remaining time = " << T - ((fsec)(Time::now() - time)).count() << " seconds. "
            << endl
            << "Agent " << agents[id].id << endl;
-    agents[id].path = agents[id].path_planner->findPath(constraint_table);
+    agents[id].path = agents[id].path_planner->findPath(constraint_table, paths);
+    paths[id] = agents[id].path;
     if (agents[id].path.empty()) break;
     neighbor.sum_of_costs += (int)agents[id].path.size() - 1;
     if (neighbor.sum_of_costs >= neighbor.old_sum_of_costs) break;
@@ -406,6 +412,7 @@ void LNS::randomWalk(int agent_id, int start_location, int start_timestep,
 }
 
 void LNS::validateSolution() const {
+  cout << "Validate LNS solution" << endl;
   int sum = 0;
   for (const auto& a1_ : agents) {
     if (a1_.path.empty()) {

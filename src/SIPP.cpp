@@ -30,7 +30,7 @@ void SIPP::updatePath(const LLNode* goal, Path& path) {
 // find path by A*
 // Returns a path that minimizes the collisions with the paths in the path table, breaking ties by
 // the length
-Path SIPP::findPath(const ConstraintTable& constraint_table) {
+Path SIPP::findPath(const ConstraintTable& constraint_table, vector<Path>& paths) {
   reset();
   ReservationTable reservation_table(constraint_table, goal_location, instance.window);
   Path path;
@@ -42,7 +42,9 @@ Path SIPP::findPath(const ConstraintTable& constraint_table) {
   auto h = max(max(my_heuristic[start_state.location], holding_time), last_target_collision_time + 1);
   auto start = new SIPPNode(State(start_state.location, 0, start_state.orientation), 0, h, nullptr, get<1>(interval),
                             get<1>(interval), get<2>(interval), get<2>(interval));
-  pushNodeToFocal(start);
+ pushNodeToFocal(start);
+  vector<tuple<int, int, int, int>> disfavor_table; // from, to, from_time, to_time
+  vector<tuple<int, int, int, int, int>> prefer_table; // from, from_ori, to_ori, from_time, to_time
 
   while (!focal_list.empty()) {
     auto* curr = focal_list.top();
@@ -83,14 +85,159 @@ Path SIPP::findPath(const ConstraintTable& constraint_table) {
                                                           curr->state.timestep + 1,
                                                           curr->high_expansion + 1)) {
         int next_high_generation, next_timestep, next_high_expansion;
-        bool next_v_collision, next_e_collision;
+        int next_v_collision, next_e_collision;
         tie(next_high_generation, next_timestep, next_high_expansion, next_v_collision,
             next_e_collision) = i;
+
+        if (next_v_collision > 0 || next_e_collision > 0) {
+                  // Deadlock Detection
+        auto &table = reservation_table.constraint_table.path_table_for_CAT->table;
+        auto to = next_state.location;
+        auto from = curr->state.location;
+        auto to_time = next_timestep;
+        auto from_time = to_time - 1;
+
+        // scoring 1
+        if (from != to && to_time - from_time == 1 && reservation_table.constraint_table.path_table_for_CAT != nullptr && !table.empty()) { // next state is moving forward
+          if (table[to].size() > from_time && table[from].size() > to_time) {
+            for (auto a1 : table[to][from_time]) {
+              for (auto a2 : table[from][to_time]) {
+                if (a1 == a2) { // the agent in front move forward
+                  int degree = abs(paths[a1][from_time].orientation - curr->state.orientation);
+                  if (degree == 2) { // the agents are facing each other
+                    disfavor_table.emplace_back(from, to, from_time, to_time);
+                    if (to_time + 1 < instance.window)
+                      disfavor_table.emplace_back(from, to, from_time + 1, to_time + 1);
+                    // cout << "Score1: " << "disfavor: " << from << " " << to << " " << from_time << " " << to_time << " " << degree << endl;
+                    // cout << "Score1: " << "disfavor: " << from << " " << to << " " << from_time + 1 << " " << to_time + 1 << " " << degree << endl;
+                  }
+                }
+              }
+            }
+          }
+
+          // scoring 2
+          if (table[to].size() > from_time + 1 && table[from].size() > to_time + 1) {
+            for (auto a1 : table[to][from_time + 1]) {
+              for (auto a2 : table[from][to_time + 1]) {
+                if (a1 == a2) { // the agent in front wait and move forward
+                  int degree = abs(paths[a1][from_time].orientation - curr->state.orientation);
+                  if (degree == 1 || degree == 3 && paths[a1][from_time].location == to) { // the agents will face each other next step
+                    disfavor_table.emplace_back(from, to, from_time, to_time);
+                    // cout << "Score2: " << "disfavor: " << from << " " << to << " " << from_time << " " << to_time << " " << degree << endl;
+                  }
+                  if (degree == 2 && paths[a1][from_time].location == to) { // the agents will face each other next step
+                    disfavor_table.emplace_back(from, to, from_time, to_time);
+                    if (to_time + 1 < instance.window)
+                      disfavor_table.emplace_back(from, to, from_time + 1, to_time + 1);
+                    // cout << "Score2: " << "disfavor: " << from << " " << to << " " << from_time << " " << to_time << " " << degree << endl;
+                    // cout << "Score2: " << "disfavor: " << from << " " << to << " " << from_time + 1 << " " << to_time + 1 << " " << degree << endl;
+                  }
+                }
+              }
+            }
+          }
+
+          // deadlock resolving 1
+          if (table[to].size() > from_time + 2 && table[from].size() > to_time + 2) {
+            for (auto a1 : table[to][from_time + 2]) {
+              for (auto a2 : table[from][to_time + 2]) {
+                if (a1 == a2 &&
+                  paths[a1][from_time].location == to &&
+                  paths[a1][from_time + 1].location == to) { // the agent in front wait and wait and move forward
+                  assert((from_time == 0 && to_time == 1) || (from_time == 1 && to_time == 2));
+                  int prefer_orientation;
+                  // left rotation
+                  if (curr->state.orientation == 0)
+                    prefer_orientation = 3;
+                  else
+                    prefer_orientation = curr->state.orientation - 1;
+                  prefer_table.emplace_back(curr->state.location, curr->state.orientation, prefer_orientation, from_time, to_time);
+                  // cout << "prefer: " << curr->state.location << " " << curr->state.orientation << " " << prefer_orientation << " " << from_time << " " << to_time << endl;
+
+                  // right rotation
+                  if (curr->state.orientation == 3)
+                    prefer_orientation = 0;
+                  else
+                    prefer_orientation = curr->state.orientation + 1;
+                  prefer_table.emplace_back(curr->state.location, curr->state.orientation, prefer_orientation, from_time, to_time);
+                  // cout << "prefer: " << curr->state.location << " " << curr->state.orientation << " " << prefer_orientation << " " << from_time << " " << to_time << endl;
+                }
+              }
+            }
+          }
+
+          // deadlock resolving 1
+          if (table[to].size() > from_time + 3 && table[from].size() > to_time + 3) {
+            for (auto a1 : table[to][from_time + 3]) {
+              for (auto a2 : table[from][to_time + 3]) {
+                if (a1 == a2 &&
+                  paths[a1][from_time].location == to &&
+                  paths[a1][from_time + 1].location == to &&
+                  paths[a1][from_time + 2].location == to) { // the agent in front wait and wait and move forward
+                  assert(from_time == 0 && to_time == 1);
+                  int prefer_orientation;
+                  // left rotation
+                  if (curr->state.orientation == 0)
+                    prefer_orientation = 3;
+                  else
+                    prefer_orientation = curr->state.orientation - 1;
+                  prefer_table.emplace_back(curr->state.location, curr->state.orientation, prefer_orientation, from_time, to_time);
+                  // cout << "prefer: " << curr->state.location << " " << curr->state.orientation << " " << prefer_orientation << " " << from_time << " " << to_time << endl;
+
+                  // right rotation
+                  if (curr->state.orientation == 3)
+                    prefer_orientation = 0;
+                  else
+                    prefer_orientation = curr->state.orientation + 1;
+                  prefer_table.emplace_back(curr->state.location, curr->state.orientation, prefer_orientation, from_time, to_time);
+                  // cout << "prefer: " << curr->state.location << " " << curr->state.orientation << " " << prefer_orientation << " " << from_time << " " << to_time << endl;
+                }
+              }
+            }
+          }
+        }
+        }
+
+        // deadlock resolving 2
+        if (!disfavor_table.empty()) {
+          for (auto &disfavor : disfavor_table) {
+            int from, to, from_time, to_time;
+            tie(from, to, from_time, to_time) = disfavor;
+            if (
+              curr->state.location == from &&
+              next_state.location == to &&
+              next_timestep - 1 == from_time &&
+              next_timestep == to_time
+              ) {
+              next_e_collision = INT_MAX / 2;
+              // remove the score from the scoring table
+              disfavor_table.erase(remove(disfavor_table.begin(), disfavor_table.end(), disfavor), disfavor_table.end());
+            }
+          }
+        }
+
+        // deadlock resolving 3
+        if (!prefer_table.empty()) {
+          for (auto &prefer : prefer_table) {
+            int from, from_ori, to_ori, from_time, to_time;
+            tie(from, from_ori, to_ori, from_time, to_time) = prefer;
+            if (
+              curr->state.location == from &&
+              curr->state.orientation == from_ori &&
+              next_state.orientation == to_ori &&
+              next_timestep - 1 == from_time &&
+              next_timestep == to_time
+              ) {
+              next_e_collision = -2;
+              // remove the score from the scoring table
+              prefer_table.erase(remove(prefer_table.begin(), prefer_table.end(), prefer), prefer_table.end());
+              }
+          }
+        }
+
         if (next_timestep + my_heuristic[next_state.location] > constraint_table.length_max) break;
-        auto next_collisions = curr->num_of_conflicts +
-                               // (int)curr->collision_v * max(next_timestep - curr->state.timestep
-                               // - 1, 0) + // wait time
-                               (int)next_v_collision + (int)next_e_collision;
+        auto next_collisions = curr->num_of_conflicts + next_v_collision + next_e_collision;
         auto next_h_val =
             max(my_heuristic[next_state.location],
                 (next_collisions > 0 ? holding_time : curr->getFVal()) - next_timestep);

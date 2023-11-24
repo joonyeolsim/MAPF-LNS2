@@ -62,7 +62,7 @@ class SIPPNode : public LLNode {
 
 class SIPP : public SingleAgentSolver {
  public:
-  Path findPath(const ConstraintTable& constraint_table);
+  Path findPath(const ConstraintTable& constraint_table, vector<Path>& paths);
 
   // return A path that minimizes collisions, breaking ties by cost
   int getTravelTime(int start, int end, const ConstraintTable& constraint_table, int upper_bound);

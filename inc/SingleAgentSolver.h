@@ -100,7 +100,7 @@ class SingleAgentSolver {
 
   const Instance& instance;
 
-  virtual Path findPath(const ConstraintTable& constraint_table) = 0;  // return the path
+  virtual Path findPath(const ConstraintTable& constraint_table, vector<Path>& paths) = 0;  // return the path
   void findMinimumSetofColldingTargets(vector<int>& goal_table, set<int>& A_target);
 
   virtual int getTravelTime(int start, int end, const ConstraintTable& constraint_table,
