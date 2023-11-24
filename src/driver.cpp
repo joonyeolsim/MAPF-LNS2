@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
   srand((int)time(0));
 
   for (int t = 0; t < 100; t++) {
-    int window = 20;
+    int window = 5;
     Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(), window, vm["agentNum"].as<int>());
     double time_limit = vm["cutoffTime"].as<double>();
     int screen = vm["screen"].as<int>();

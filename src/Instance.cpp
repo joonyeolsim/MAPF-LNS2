@@ -84,7 +84,7 @@ void Instance::generateRandomAgents(int warehouse_width) {
           goal = randomWalk(goal, 1);*/
 
       // update start
-      start_states[k] = start;
+      start_states[k] = State(start, 0, rand() % 4);
       starts[start] = true;
       // update goal
       goal_locations[k] = goal;
@@ -486,9 +486,9 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
     if (paths[i] == nullptr or paths[i]->empty()) {
       cerr << "No path for agent " << i << endl;
       exit(-1);
-    } else if (start_states[i] != paths[i]->front().location) {
+    } else if (start_states[i].location != paths[i]->front().location) {
       cerr << "The path of agent " << i << " starts from location " << paths[i]->front().location
-           << ", which is different from its start location " << start_states[i] << endl;
+           << ", which is different from its start location " << start_states[i].location << endl;
       exit(-1);
     } else if (goal_locations[i] != paths[i]->back().location) {
       cerr << "The path of agent " << i << " ends at location " << paths[i]->back().location
