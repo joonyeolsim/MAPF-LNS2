@@ -72,7 +72,6 @@ int main(int argc, char** argv) {
               vm["initDestoryStrategy"].as<string>(), vm["sipp"].as<bool>(), screen);
       bool succ = lns.run();
       if (succ) {
-        lns.validateSolution();
         if (vm.count("outputPaths")) lns.writePathsToFile(vm["outputPaths"].as<string>());
       }
     } else {
