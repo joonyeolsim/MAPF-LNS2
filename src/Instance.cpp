@@ -527,6 +527,10 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
             exit(-1);
           }
           collisions++;
+          // cout << "Find a vertex conflict between agents " << a1 << " and " << a2
+          //      << " at location " << paths[a1]->at(t).location << " at timestep " << t << endl;
+          // cout << "Agent " << a1 << ": " << *paths[a1] << endl;
+          // cout << "Agent " << a2 << ": " << *paths[a2] << endl;
           found_collision = true;
           break;
         } else if (paths[a1]->at(t).location == paths[a2]->at(t - 1).location &&
@@ -539,6 +543,11 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
             exit(-1);
           }
           collisions++;
+          // cout << "Find an edge conflict between agents " << a1 << " and " << a2 << " at edge ("
+          //      << paths[a1]->at(t - 1).location << "," << paths[a1]->at(t).location
+          //      << ") at timestep " << t << endl;
+          // cout << "Agent " << a1 << ": " << *paths[a1] << endl;
+          // cout << "Agent " << a2 << ": " << *paths[a2] << endl;
           found_collision = true;
           break;
         }
@@ -556,6 +565,12 @@ bool Instance::validateSolution(const vector<Path *> &paths, int sum_of_costs,
               exit(-1);
             }
             collisions++;
+            // cout << "Find a target conflict where agent " << a2 << " (of length "
+            //      << paths[a2]->size() - 1 << ") traverses agent " << a1 << " (of length "
+            //      << paths[a1]->size() - 1 << ")'s target location " << target << " at timestep "
+            //      << t << endl;
+            // cout << "Agent " << a1 << ": " << *paths[a1] << endl;
+            // cout << "Agent " << a2 << ": " << *paths[a2] << endl;
             break;
           }
         }

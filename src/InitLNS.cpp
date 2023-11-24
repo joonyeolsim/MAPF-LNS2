@@ -178,15 +178,26 @@ bool InitLNS::runPP() {
   double T = min(time_limit - runtime, replan_time_limit);
   auto time = Time::now();
   ConstraintTable constraint_table(instance.num_of_cols, instance.map_size, nullptr, &path_table);
+  vector<Path> paths;
+  paths.resize(agents.size());
+  for (int i = 0; i < agents.size(); i++) {
+    paths[i] = agents[i].path;
+  }
+  // for (const auto &agent : shuffled_agents) {
+  //   cout << agent << " ";
+  // }
+  // cout << endl;
   while (p != shuffled_agents.end() && ((fsec)(Time::now() - time)).count() < T) {
     int id = *p;
-    agents[id].path = agents[id].path_planner->findPath(constraint_table);
+    // cout << "Agent: " << id << endl;
+    agents[id].path = agents[id].path_planner->findPath(constraint_table, paths);
+    paths[id] = agents[id].path;
     assert(!agents[id].path.empty() &&
            agents[id].path.back().location == agents[id].path_planner->goal_location);
-    if (agents[id].path_planner->num_collisions > 0)
-      updateCollidingPairs(neighbor.colliding_pairs, agents[id].id, agents[id].path);
-    assert(agents[id].path_planner->num_collisions > 0 or
-           !updateCollidingPairs(neighbor.colliding_pairs, agents[id].id, agents[id].path));
+    // if (agents[id].path_planner->num_collisions > 0)
+    updateCollidingPairs(neighbor.colliding_pairs, agents[id].id, agents[id].path);
+    // assert(agents[id].path_planner->num_collisions > 0 or
+    //        !updateCollidingPairs(neighbor.colliding_pairs, agents[id].id, agents[id].path));
     neighbor.sum_of_costs += (int)agents[id].path.size() - 1;
     remaining_agents--;
     if (screen >= 3) {
@@ -196,7 +207,7 @@ bool InitLNS::runPP() {
            << ", LL nodes = " << agents[id].path_planner->getNumExpanded()
            << ", remaining time = " << time_limit - runtime << " seconds. " << endl;
     }
-    if (neighbor.colliding_pairs.size() >= neighbor.old_colliding_pairs.size()) break;
+    if (neighbor.colliding_pairs.size() > neighbor.old_colliding_pairs.size()) break;
     path_table.insertPath(agents[id].id, agents[id].path);
     ++p;
   }
@@ -207,6 +218,7 @@ bool InitLNS::runPP() {
     return true;
   } else  // stick to old paths
   {
+    // cout << "Stick to old paths!!!!!!!!!!!!!" << endl;
     if (p != shuffled_agents.end()) num_of_failures++;
     auto p2 = shuffled_agents.begin();
     while (p2 != p) {
@@ -244,12 +256,18 @@ bool InitLNS::getInitialSolution() {
   std::random_shuffle(neighbor.agents.begin(), neighbor.agents.end());
   ConstraintTable constraint_table(instance.num_of_cols, instance.map_size, nullptr, &path_table);
   set<pair<int, int>> colliding_pairs;
+  vector<Path> paths;
+  paths.resize(agents.size());
+  for (int i = 0; i < agents.size(); i++) {
+    paths[i] = agents[i].path;
+  }
   for (auto id : neighbor.agents) {
-    agents[id].path = agents[id].path_planner->findPath(constraint_table);
+    agents[id].path = agents[id].path_planner->findPath(constraint_table, paths);
+    paths[id] = agents[id].path;
     assert(!agents[id].path.empty() &&
            agents[id].path.back().location == agents[id].path_planner->goal_location);
-    if (agents[id].path_planner->num_collisions > 0)
-      updateCollidingPairs(colliding_pairs, agents[id].id, agents[id].path);
+    // if (agents[id].path_planner->num_collisions > 0)
+    updateCollidingPairs(colliding_pairs, agents[id].id, agents[id].path);
     sum_of_costs += (int)agents[id].path.size() - 1;
     remaining_agents--;
     path_table.insertPath(agents[id].id, agents[id].path);
@@ -285,18 +303,18 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
       for (auto id : path_table.table[to][t]) {
         succ = true;
         colliding_pairs.emplace(min(agent_id, id), max(agent_id, id));
-        cout << "Vertex conflict: " << agent_id << " and " << id << " at " << to << " at time " << t
-             << endl;
-        cout << "Agent " << agent_id << ": ";
-        for (int i = 0; i < instance.window; i++) {
-          cout << "(" << path[i] << ")->";
-        }
-        cout << endl;
-        cout << "Agent " << id << ": ";
-        for (int i = 0; i < instance.window; i++) {
-          cout << "(" << agents[id].path[i] << ")->";
-        }
-        cout << endl;
+        // cout << "Vertex conflict: " << agent_id << " and " << id << " at " << to << " at time " << t
+        //      << endl;
+        // cout << "Agent " << agent_id << ": ";
+        // for (int i = 0; i < instance.window; i++) {
+        //   cout << "(" << path[i] << ")->";
+        // }
+        // cout << endl;
+        // cout << "Agent " << id << ": ";
+        // for (int i = 0; i < instance.window; i++) {
+        //   cout << "(" << agents[id].path[i] << ")->";
+        // }
+        // cout << endl;
       }
     }
     if (from != to && path_table.table[to].size() >= t &&
@@ -307,18 +325,18 @@ bool InitLNS::updateCollidingPairs(set<pair<int, int>>& colliding_pairs, int age
           if (a1 == a2) {
             succ = true;
             colliding_pairs.emplace(min(agent_id, a1), max(agent_id, a1));
-            cout << "Edge conflict: " << agent_id << " and " << a1 << " at " << to << " at time " << t
-                 << endl;
-            cout << "Agent " << agent_id << ": ";
-            for (int i = 0; i < instance.window; i++) {
-              cout << "(" << path[i] << ")->";
-            }
-            cout << endl;
-            cout << "Agent " << a1 << ": ";
-            for (int i = 0; i < instance.window; i++) {
-              cout << "(" << agents[a1].path[i] << ")->";
-            }
-            cout << endl;
+            // cout << "Edge conflict: " << agent_id << " and " << a1 << " at " << to << " at time " << t
+            //      << endl;
+            // cout << "Agent " << agent_id << ": ";
+            // for (int i = 0; i < instance.window; i++) {
+            //   cout << "(" << path[i] << ")->";
+            // }
+            // cout << endl;
+            // cout << "Agent " << a1 << ": ";
+            // for (int i = 0; i < instance.window; i++) {
+            //   cout << "(" << agents[a1].path[i] << ")->";
+            // }
+            // cout << endl;
             break;
           }
         }
@@ -533,10 +551,10 @@ bool InitLNS::generateNeighborRandomly() {
 
 // Random walk; return the first agent that the agent collides with
 int InitLNS::randomWalk(int agent_id) {
-  int t = rand() % agents[agent_id].path.size();
+  int t = rand() % min((int) agents[agent_id].path.size(), instance.window);
   int loc = agents[agent_id].path[t].location;
   while (
-      t <= path_table.makespan and
+      t <= min(path_table.makespan, instance.window - 1) and
       (path_table.table[loc].size() <= t or path_table.table[loc][t].empty() or
        (path_table.table[loc][t].size() == 1 and path_table.table[loc][t].front() == agent_id))) {
     auto next_locs = instance.getNeighbors(loc);
@@ -546,7 +564,7 @@ int InitLNS::randomWalk(int agent_id) {
     loc = *std::next(next_locs.begin(), rand() % next_locs.size());
     t = t + 1;
   }
-  if (t > path_table.makespan)
+  if (t > min(path_table.makespan, instance.window - 1))
     return NO_AGENT;
   else
     return *std::next(path_table.table[loc][t].begin(), rand() % path_table.table[loc][t].size());

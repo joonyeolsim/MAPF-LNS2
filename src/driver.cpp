@@ -57,7 +57,8 @@ int main(int argc, char** argv) {
 
   srand((int)time(0));
 
-  for (int t = 0; t < 100; t++) {
+  for (int t = 0; t < 500; t++) {
+    cout << "Start!!!! Step " << t << endl;
     int window = 5;
     Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(), window, vm["agentNum"].as<int>());
     double time_limit = vm["cutoffTime"].as<double>();
@@ -71,7 +72,6 @@ int main(int argc, char** argv) {
               vm["initDestoryStrategy"].as<string>(), vm["sipp"].as<bool>(), screen);
       bool succ = lns.run();
       if (succ) {
-        lns.validateSolution();
         if (vm.count("outputPaths")) lns.writePathsToFile(vm["outputPaths"].as<string>());
       }
     } else {
