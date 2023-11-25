@@ -60,8 +60,9 @@ int main(int argc, char** argv) {
   po::notify(vm);
 
   srand((int)time(0));
+  int window = 5;
 
-  Instance instance(vm["map"].as<string>(), vm["agents"].as<string>(), vm["agentNum"].as<int>());
+  Instance instance(window, vm["map"].as<string>(), vm["agents"].as<string>(), vm["agentNum"].as<int>());
   double time_limit = vm["cutoffTime"].as<double>();
   int screen = vm["screen"].as<int>();
   srand(vm["seed"].as<int>());

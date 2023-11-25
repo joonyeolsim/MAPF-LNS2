@@ -7,9 +7,9 @@
 
 int RANDOM_WALK_STEPS = 100000;
 
-Instance::Instance(const string& map_fname, const string& agent_fname, int num_of_agents, int num_of_rows,
+Instance::Instance(int window, const string& map_fname, const string& agent_fname, int num_of_agents, int num_of_rows,
                    int num_of_cols, int num_of_obstacles, int warehouse_width)
-    : map_fname(map_fname), agent_fname(agent_fname), num_of_agents(num_of_agents) {
+    : window(window), map_fname(map_fname), agent_fname(agent_fname), num_of_agents(num_of_agents) {
   bool succ = loadMap();
   if (!succ) {
     if (num_of_rows > 0 && num_of_cols > 0 && num_of_obstacles >= 0 &&
@@ -467,7 +467,7 @@ bool Instance::validateSolution(const vector<Path*>& paths, int sum_of_costs, in
       const auto a1 = paths[i]->size() <= paths[j]->size() ? i : j;
       const auto a2 = paths[i]->size() <= paths[j]->size() ? j : i;
       int t = 1;
-      for (; t < (int)paths[a1]->size(); t++) {
+      for (; t < min((int)paths[a1]->size(), window); t++) {
         if (paths[a1]->at(t).location == paths[a2]->at(t).location)  // vertex conflict
         {
           if (num_of_colliding_pairs == 0) {
@@ -493,7 +493,7 @@ bool Instance::validateSolution(const vector<Path*>& paths, int sum_of_costs, in
       }
       if (!found_collision) {
         auto target = paths[a1]->back().location;
-        for (; t < (int)paths[a2]->size(); t++) {
+        for (; t < min((int)paths[a2]->size(), window); t++) {
           if (paths[a2]->at(t).location == target)  // target conflict
           {
             if (num_of_colliding_pairs == 0) {
