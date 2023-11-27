@@ -64,11 +64,6 @@ class SIPP : public SingleAgentSolver {
   // lowerbound is an underestimation of the length of the path in order to speed up the search.
   // Path findOptimalPath(const PathTable& path_table) {return Path(); } // TODO: To implement
   // Path findOptimalPath(const ConstraintTable& constraint_table, const PathTableWC& path_table);
-  Path findOptimalPath(const HLNode& node, const ConstraintTable& initial_constraints, const vector<Path*>& paths,
-                       int agent, int lowerbound);
-  pair<Path, int> findSuboptimalPath(const HLNode& node, const ConstraintTable& initial_constraints,
-                                     const vector<Path*>& paths, int agent, int lowerbound,
-                                     double w);  // return the path and the lowerbound
   Path findPath(
       const ConstraintTable& constraint_table);  // return A path that minimizes collisions, breaking ties by cost
   int getTravelTime(int start, int end, const ConstraintTable& constraint_table, int upper_bound);

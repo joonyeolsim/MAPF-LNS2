@@ -2,15 +2,6 @@
 #include "BasicLNS.h"
 #include "InitLNS.h"
 
-// pibt related
-#include "mapf.h"
-#include "pibt.h"
-#include "pibt_agent.h"
-#include "pps.h"
-#include "problem.h"
-#include "simplegrid.h"
-#include "winpibt.h"
-
 enum destroy_heuristic { RANDOMAGENTS, RANDOMWALK, INTERSECTION, DESTORY_COUNT };
 
 // TODO: adaptively change the neighbor size, that is,
@@ -60,9 +51,6 @@ class LNS : public BasicLNS {
   bool runPIBT();
   bool runPPS();
   bool runWinPIBT();
-
-  MAPF preparePIBTProblem(vector<int>& shuffled_agents);
-  void updatePIBTResult(const PIBT_Agents& A, vector<int>& shuffled_agents);
 
   void chooseDestroyHeuristicbyALNS();
 
