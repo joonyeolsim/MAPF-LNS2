@@ -189,7 +189,7 @@ bool InitLNS::runPP() {
            << ", LL nodes = " << agents[id].path_planner->getNumExpanded()
            << ", remaining time = " << time_limit - runtime << " seconds. " << endl;
     }
-    if (neighbor.colliding_pairs.size() >= neighbor.old_colliding_pairs.size()) break;
+    if (neighbor.colliding_pairs.size() > neighbor.old_colliding_pairs.size()) break;
     path_table.insertPath(agents[id].id, agents[id].path);
     ++p;
   }

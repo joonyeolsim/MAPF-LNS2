@@ -211,7 +211,7 @@ bool LNS::runPP() {
     agents[id].path = agents[id].path_planner->findPath(constraint_table);
     if (agents[id].path.empty()) break;
     neighbor.sum_of_costs += (int)agents[id].path.size() - 1;
-    if (neighbor.sum_of_costs >= neighbor.old_sum_of_costs) break;
+    if (neighbor.sum_of_costs > neighbor.old_sum_of_costs) break;
     remaining_agents--;
     path_table.insertPath(agents[id].id, agents[id].path);
     ++p;
