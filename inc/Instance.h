@@ -1,5 +1,6 @@
 #pragma once
 #include "common.h"
+#include "random"
 
 // Currently only works for undirected unweighted 4-nighbor grids
 class Instance {
